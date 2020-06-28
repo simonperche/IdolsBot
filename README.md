@@ -8,6 +8,7 @@ A [Mudae](https://top.gg/bot/432610292342587392) like bot only for KPop idols.
 
 | Feature                    | Progress     |
 |----------------------------|--------------|
+| Create database            | In dev       |
 | Roll random idol           | To do        |
 | Wishlist                   | To do        |
 | Trade                      | To do        |
