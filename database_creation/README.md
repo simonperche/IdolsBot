@@ -4,11 +4,11 @@ A KPop Idols database in multiple formats. All data come from [kpopping](https:/
 
 ## Tasks
 
-| Feature                    | Progress     |
-|----------------------------|--------------|
-| Extract to JSON format     | Done         |
-| JSON to SQL                | To do        |
-| Better extraction of images| To do        |
+| Feature                     | Progress     |
+|-----------------------------|--------------|
+| Extract to JSON format      | Done         |
+| JSON to SQL                 | Done         |
+| Better extraction of images | To do        |
 
 ## Database
 ### JSON
@@ -23,7 +23,11 @@ JSON file is made with the following format :
 }
 ```
 
-### Example
+Execute `extract_to_json.py` to create `database.json` with this format. 
+All fields are mandatory so if an idol does not have group or image, 
+he/she will not be kept in the final file.
+
+#### Field example
 ```json
 {"166": 
   {"url": "https://kpopping.com/profiles/artist/2449-Chuu", 
@@ -35,8 +39,15 @@ JSON file is made with the following format :
 }
 ```
 
-## SQLite
-To do.
+### SQLite
+SQLite database file is created using the previous generated json file. 
+
+The script `json_to_sql.py` may take an argument
+(`--file` or `-f`) as input json filename. By default, `database.json` will be used. 
+A `database.db`containing SQLite database will be created where the script is executed.
+
+#### Database diagram
+![Database Diagram](../readmefiles/idols_db.png)
 
 ## Legal rights
 All data are extracted from [kpopping website](https://kpopping.com). According to their [__Terms and Policies__](https://kpopping.com/help/21-Terms-and-Policies) (accessed June 29, 2020) :
