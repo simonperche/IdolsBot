@@ -15,6 +15,7 @@ import os
 
 import getopt
 import sqlite3
+import json
 
 
 def main(argv):
@@ -46,7 +47,11 @@ def main(argv):
     if c.fetchone()[0] != 1:
         create_database_schema(db)
 
-    populate_database(db, json_filename)
+    if not populate_database(db, json_filename):
+        print("Error while populate database. Please check the integrity of json file. 'database.db' remains unchanged.")
+        sys.exit(2)
+
+    print("Done.")
 
 
 def usage():
@@ -67,7 +72,43 @@ def create_database_schema(db):
 
 
 def populate_database(db, json_filename):
-    print("WIP")
+    print("Populating database...")
+    data = {}
+    with open(json_filename) as json_file:
+        data = json.load(json_file)
+
+    c = db.cursor()
+
+    for id_json in data:
+        c.execute(''' INSERT OR IGNORE INTO Idol(name, url) VALUES (?, ?) ''', (data[id_json]['name'], data[id_json]['url'],))
+
+        c.execute(''' SELECT id FROM Idol WHERE url = ? ''', (data[id_json]['url'],))
+        id_idol = c.fetchone()
+
+        if not id_idol:
+            return False
+
+        id_idol = id_idol[0]
+
+        for group in data[id_json]['groups']:
+            c.execute(''' INSERT OR IGNORE INTO Groups(name) VALUES (?) ''', (group,))
+            c.execute(''' SELECT id FROM Groups WHERE name = ? ''', (group,))
+            id_group = c.fetchone()
+
+            if not id_group:
+                return False
+
+            id_group = id_group[0]
+
+            c.execute(''' INSERT OR IGNORE INTO IdolGroups(id_idol, id_groups) VALUES (?, ?) ''', (id_idol, id_group,))
+
+        for img_url in data[id_json]['img_url']:
+            c.execute(''' INSERT OR IGNORE INTO Image(url, id_idol) VALUES (?, ?) ''', (img_url, id_idol,))
+
+    db.commit()
+    c.close()
+
+    return True
 
 
 if __name__ == "__main__":

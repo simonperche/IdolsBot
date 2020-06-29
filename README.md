@@ -14,6 +14,7 @@ A [Mudae](https://top.gg/bot/432610292342587392) like bot only for KPop idols.
 | Wishlist                   | To do        |
 | Trade                      | To do        |
 | Monetary system            | To do        |
+| Custom groups and idols    | To do        |
 
 
 ## Creating necessary files
