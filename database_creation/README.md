@@ -35,7 +35,7 @@ JSON file is made with the following format :
 }
 ```
 
-## SQL
+## SQLite
 To do.
 
 ## Legal rights
