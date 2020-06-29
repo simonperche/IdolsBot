@@ -1,7 +1,7 @@
 CREATE TABLE Idol (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
-name TEXT,
-url TEXT UNIQUE);
+url TEXT UNIQUE,
+name TEXT);
 
 -- 'Group' is a reserved name
 CREATE TABLE Groups (

@@ -1,5 +1,5 @@
 """
-JSON to SQL script
+JSON to SQL script.
 
     This script takes JSON file with specific format and create a SQL database from it.
 
@@ -21,7 +21,7 @@ import json
 def main(argv):
     json_filename = 'database.json'
     try:
-        opts, args = getopt.getopt(argv, "hf:", ["help", "file="])
+        opts, _ = getopt.getopt(argv, "hf:", ["help", "file="])
     except getopt.GetoptError:
         print("Arguments error. Please look at the help of the script.\n")
         usage()
