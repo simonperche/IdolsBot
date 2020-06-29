@@ -17,8 +17,8 @@ JSON file is made with the following format :
 {"id":
     {"url":     "url_of_kpopping_page",
      "name" :   "name_of_idol",
-     "groups":  ["group1", "group2"...],
-     "img_url": ["img1", "img2"...]
+     "groups":  ["group1", "group2"],
+     "img_url": ["img1", "img2"]
     }
 }
 ```
