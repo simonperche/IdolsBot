@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Extraction of kpop idol
+"""
+Extraction of kpop idol
 
     This script extract and store in JSON file kpop idols from KPopping website (https://kpopping.com).
 """
