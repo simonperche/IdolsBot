@@ -1,6 +1,6 @@
 # KPop Database Creation
 
-A KPop Idols database in multiple formats. All data come from [KPopping](https://kpopping.com).
+A KPop Idols database in multiple formats. All data come from [kpopping](https://kpopping.com).
 
 ## Tasks
 
@@ -39,7 +39,7 @@ JSON file is made with the following format :
 To do.
 
 ## Legal rights
-All data are extracted from [KPopping website](https://kpopping.com). According to their [__Terms and Policies__](https://kpopping.com/help/21-Terms-and-Policies) (accessed June 29, 2020) :
+All data are extracted from [kpopping website](https://kpopping.com). According to their [__Terms and Policies__](https://kpopping.com/help/21-Terms-and-Policies) (accessed June 29, 2020) :
 
 ```
 USE OF Kpopping CONTENT

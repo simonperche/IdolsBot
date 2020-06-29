@@ -3,6 +3,7 @@
 A [Mudae](https://top.gg/bot/432610292342587392) like bot only for KPop idols.
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e7e94a9dbe624ba4b520b265fbe728fc)](https://www.codacy.com/manual/Solidras/IdolsBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Solidras/IdolsBot&amp;utm_campaign=Badge_Grade)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
  
 ## Tasks
 
