@@ -37,12 +37,37 @@ def main(argv):
         print("File error : ", json_filename, " does not exist.")
         sys.exit(2)
 
+    db = sqlite3.connect('./database.db')
+
+    c = db.cursor()
+    # Query to check if the schema exists
+    c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='Idol' ''')
+
+    if c.fetchone()[0] != 1:
+        create_database_schema(db)
+
+    populate_database(db, json_filename)
+
 
 def usage():
     print("JSON to SQL script."
           "\nParameters :"
           "\n\t(--file | -f) name_of_the_json_file -> could be added to specify the json file."
           "\n\t--help | -h -> display this message.")
+
+
+def create_database_schema(db):
+    print("Creating database schema...")
+    query = open('create_database.sql', 'r').read()
+
+    c = db.cursor()
+    c.executescript(query)
+    db.commit()
+    c.close()
+
+
+def populate_database(db, json_filename):
+    print("WIP")
 
 
 if __name__ == "__main__":
