@@ -14,11 +14,11 @@ A KPop Idols database in multiple formats. All data come from [KPopping](https:/
 ### JSON
 JSON file is made with the following format :
 ```json
-{id:
-    {"url":     url_of_kpopping_page,
-     "name" :   name_of_idol,
-     "groups":  [group1, group2...],
-     "img_url": [img1, img2...]
+{"id":
+    {"url":     "url_of_kpopping_page",
+     "name" :   "name_of_idol",
+     "groups":  ["group1", "group2"],
+     "img_url": ["img1", "img2"]
     }
 }
 ```
