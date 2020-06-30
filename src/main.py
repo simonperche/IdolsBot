@@ -3,10 +3,13 @@ import os
 from discord.ext import commands
 from dotenv import load_dotenv
 
+from roll import Roll
+
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 bot = commands.Bot(command_prefix='*')
 
+bot.add_cog(Roll(bot))
 
 #### Bot commands ####
 

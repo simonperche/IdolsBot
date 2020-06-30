@@ -65,7 +65,7 @@ class DatabaseIdol:
         return random_idol[0][0]
 
     def get_idol_information(self, id_idol):
-        """ Return idol information with (name, group, image) format """
+        """ Return idol information with dict {name, group, image} format """
 
         c = DatabaseIdol.__db.cursor()
         c.execute(''' SELECT I.name, G.name, Image.url 
@@ -74,9 +74,9 @@ class DatabaseIdol:
                       JOIN Groups AS G ON IG.id_groups = G.id
                       JOIN Image ON Image.id_idol = I.id
                       WHERE I.id = ? ''', (id_idol,))
-        idol = c.fetchall()
+        idol = c.fetchall()[0]
         c.close()
 
-        return idol[0]
+        return {'name': idol[0], 'group': idol[1], 'image': idol[2]}
 
 
