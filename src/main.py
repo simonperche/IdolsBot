@@ -25,6 +25,7 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
