@@ -37,7 +37,7 @@ class DatabaseIdol:
 
     def get_group_members(self, group_name):
         c = self.db.cursor()
-        c.execute('''SELECT I.name FROM Idol AS I 
+        c.execute('''SELECT I.name FROM Idol AS I
                      JOIN IdolGroups AS IG ON IG.id_idol = I.id 
                      JOIN Groups AS G ON IG.id_groups = G.id
                      WHERE G.name = ? COLLATE NOCASE''', (group_name,))
@@ -50,9 +50,8 @@ class DatabaseIdol:
 
     def get_random_idol_id(self):
         """Return random idol id"""
-
         c = self.db.cursor()
-        c.execute('''SELECT Idol.id 
+        c.execute('''SELECT Idol.id
                      FROM Idol
                      ORDER BY RANDOM() LIMIT 1''')
         random_idol = c.fetchall()
@@ -66,9 +65,9 @@ class DatabaseIdol:
         """Return idol information with dict {name, group, image} format"""
 
         c = self.db.cursor()
-        c.execute('''SELECT I.name, G.name, Image.url 
-                     FROM Idol AS I 
-                     JOIN IdolGroups AS IG ON IG.id_idol = I.id 
+        c.execute('''SELECT I.name, G.name, Image.url
+                     FROM Idol AS I
+                     JOIN IdolGroups AS IG ON IG.id_idol = I.id
                      JOIN Groups AS G ON IG.id_groups = G.id
                      JOIN Image ON Image.id_idol = I.id
                      WHERE I.id = ?''', (id_idol,))
