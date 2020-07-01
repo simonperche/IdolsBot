@@ -1,5 +1,4 @@
-"""
-JSON to SQL script.
+"""JSON to SQL script.
 
     This script takes JSON file with specific format and create a SQL database from it.
 

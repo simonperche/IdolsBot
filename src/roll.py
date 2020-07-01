@@ -10,6 +10,7 @@ class Roll(commands.Cog):
     CLAIM_TIMEOUT = 5.0
 
     def __init__(self, bot):
+        """Initial the cog with the bot"""
         self.bot = bot
 
     #### Commands ####
