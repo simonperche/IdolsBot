@@ -1,4 +1,5 @@
-"""Singleton classes representing databases.
+"""
+Singleton classes representing databases.
 
 These classes provide functions to access to data in idols and member database.
 """
@@ -63,7 +64,6 @@ class DatabaseIdol:
 
     def get_idol_information(self, id_idol):
         """Return idol information with dict {name, group, image} format"""
-
         c = self.db.cursor()
         c.execute('''SELECT I.name, G.name, Image.url
                      FROM Idol AS I

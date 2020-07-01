@@ -1,4 +1,4 @@
-import random
+import secrets
 import discord
 import asyncio
 from database import DatabaseIdol
@@ -22,7 +22,7 @@ class Roll(commands.Cog):
             ctx.send("An error occurred. If this message is exceptional, "
                      "please try again. Otherwise, contact the administrator.")
 
-        embed = discord.Embed(title=idol['name'], description=idol['group'], colour=random.randint(0, 0xffffff))
+        embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
         embed.set_image(url=idol['image'])
 
         msg = await ctx.send(embed=embed)
