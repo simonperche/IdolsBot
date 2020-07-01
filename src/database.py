@@ -9,7 +9,6 @@ import sqlite3
 
 class DatabaseIdol:
     __instance = None
-    __db = None
 
     @staticmethod
     def get():
@@ -21,14 +20,14 @@ class DatabaseIdol:
         """ Virtually private constructor. """
         if DatabaseIdol.__instance is None:
             DatabaseIdol.__instance = self
-            DatabaseIdol.__db = sqlite3.connect('./database.db')
+            self.db = sqlite3.connect('./database.db')
 
     def connect(self, filename):
-        DatabaseIdol.__db.close()
-        DatabaseIdol.__db = sqlite3.connect(filename)
+        self.db.close()
+        self.db = sqlite3.connect(filename)
 
     def get_idol_ids(self, name):
-        c = DatabaseIdol.__db.cursor()
+        c = self.db.cursor()
         c.execute(''' SELECT I.id FROM Idol AS I WHERE I.name = ? COLLATE NOCASE ''', (name,))
         results = c.fetchall()
         c.close()
@@ -38,7 +37,7 @@ class DatabaseIdol:
         return ids
 
     def get_group_members(self, group_name):
-        c = DatabaseIdol.__db.cursor()
+        c = self.db.cursor()
         c.execute(''' SELECT I.name FROM Idol AS I 
                       JOIN IdolGroups AS IG ON IG.id_idol = I.id 
                       JOIN Groups AS G ON IG.id_groups = G.id
@@ -53,7 +52,7 @@ class DatabaseIdol:
     def get_random_idol_id(self):
         """ Return random idol id """
 
-        c = DatabaseIdol.__db.cursor()
+        c = self.db.cursor()
         c.execute(''' SELECT Idol.id 
                       FROM Idol
                       ORDER BY RANDOM() LIMIT 1 ''')
@@ -67,7 +66,7 @@ class DatabaseIdol:
     def get_idol_information(self, id_idol):
         """ Return idol information with dict {name, group, image} format """
 
-        c = DatabaseIdol.__db.cursor()
+        c = self.db.cursor()
         c.execute(''' SELECT I.name, G.name, Image.url 
                       FROM Idol AS I 
                       JOIN IdolGroups AS IG ON IG.id_idol = I.id 
