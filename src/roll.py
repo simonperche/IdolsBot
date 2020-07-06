@@ -18,13 +18,25 @@ class Roll(commands.Cog):
 
     @commands.command(description='Roll a random idom and get the possibility to claim it.')
     async def roll(self, ctx):
+        minutes = min_until_next_roll(ctx.guild.id, ctx.author.id)
+        if minutes != 0:
+            await ctx.send(f'You cannot roll right now. The next roll reset is in {minutes} minutes.')
+            return
+
         idol = DatabaseIdol.get().get_idol_information(DatabaseIdol.get().get_random_idol_id())
         if not idol:
             ctx.send("An error occurred. If this message is exceptional, "
                      "please try again. Otherwise, contact the administrator.")
 
+        # Update roll information in database
+        DatabaseDeck.get().update_last_roll(ctx.guild.id, ctx.author.id)
+        user_nb_rolls = DatabaseDeck.get().get_nb_rolls(ctx.guild.id, ctx.author.id)
+        DatabaseDeck.get().set_nb_rolls(ctx.guild.id, ctx.author.id, user_nb_rolls + 1)
+
         embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
         embed.set_image(url=idol['image'])
+
+        # TODO: add footer 'belongs to'
 
         msg = await ctx.send(embed=embed)
         emoji = '\N{TWO HEARTS}'
@@ -39,7 +51,6 @@ class Roll(commands.Cog):
             try:
                 _, user = await self.bot.wait_for('reaction_add', timeout=Roll.CLAIM_TIMEOUT, check=check)
             except asyncio.TimeoutError:
-                # Temporary message
                 await msg.remove_reaction(emoji, self.bot.user)
                 is_claimed_or_timeout = True
             else:
@@ -58,7 +69,7 @@ async def claim(ctx, user, idol):
     time_until_claim = 0
 
     # User never claimed an idol
-    if last_claim == -1:
+    if not last_claim:
         can_claim = True
     else:
         claim_interval = DatabaseDeck.get().get_claim_interval(id_server)
@@ -80,3 +91,27 @@ async def claim(ctx, user, idol):
                        f'Please wait {str(time[0])} h {str(time[1])} min.')
 
     return can_claim
+
+
+def min_until_next_roll(id_server, id_user):
+    """Return minutes until next roll (0 if the user can roll now)"""
+    last_roll = DatabaseDeck.get().get_last_roll(id_server, id_user)
+
+    if not last_roll:
+        return 0
+
+    last_roll = datetime.strptime(last_roll, '%Y-%m-%d %H:%M:%S')
+    now = datetime.now()
+
+    # If a new hour began
+    if now.date() != last_roll.date() or (now.date() == last_roll.date() and now.hour != last_roll.hour):
+        DatabaseDeck.get().set_nb_rolls(id_server, id_user, 0)
+        return 0
+
+    max_rolls = DatabaseDeck.get().get_rolls_per_hour(id_server)
+    user_nb_rolls = DatabaseDeck.get().get_nb_rolls(id_server, id_user)
+
+    if user_nb_rolls < max_rolls:
+        return 0
+    else:
+        return 60 - now.minute

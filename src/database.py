@@ -141,9 +141,10 @@ class DatabaseDeck:
 
     def update_last_claim(self, id_server, id_member):
         c = self.db.cursor()
-        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member) VALUES (?, ?)''', (id_server, id_member))
-        c.execute('''UPDATE MemberInformation 
-                     SET last_claim = datetime('now', 'localtime') 
+        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member) 
+                     VALUES (?, ?)''', (id_server, id_member))
+        c.execute('''UPDATE MemberInformation
+                     SET last_claim = datetime('now', 'localtime')
                      WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
         self.db.commit()
         c.close()
@@ -159,12 +160,11 @@ class DatabaseDeck:
     def get_last_claim(self, id_server, id_member):
         """Return last claim date or -1 otherwise"""
         c = self.db.cursor()
-        c.execute('''SELECT last_claim FROM MemberInformation WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        c.execute('''SELECT last_claim
+                     FROM MemberInformation
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
         last_claim = c.fetchone()
         c.close()
-
-        if not last_claim:
-            return -1
 
         return last_claim[0]
 
@@ -180,10 +180,17 @@ class DatabaseDeck:
         self.db.commit()
         c.close()
 
+    def create_member_information_if_not_exist(self, id_server, id_member):
+        c = self.db.cursor()
+        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member) 
+                                     VALUES (?, ?)''', (id_server, id_member))
+        self.db.commit()
+        c.close()
+
     def set_claiming_interval(self, id_server, interval):
         self.create_server_if_not_exist(id_server)
         c = self.db.cursor()
-        c.execute('''UPDATE Server 
+        c.execute('''UPDATE Server
                      SET claim_interval = ?
                      WHERE id = ?''', (interval, id_server))
         self.db.commit()
@@ -192,9 +199,72 @@ class DatabaseDeck:
     def get_user_deck(self, id_server, id_member):
         """Return a list of idol ids"""
         c = self.db.cursor()
-        c.execute('''SELECT id_idol 
-                     FROM Deck 
+        c.execute('''SELECT id_idol
+                     FROM Deck
                      WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
         ids = c.fetchall()
         c.close()
         return [id_idol[0] for id_idol in ids]
+
+    def get_last_roll(self, id_server, id_member):
+        """Return last roll date or None otherwise"""
+        c = self.db.cursor()
+        c.execute('''SELECT last_roll
+                     FROM MemberInformation
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        last_roll = c.fetchone()
+        c.close()
+
+        if not last_roll:
+            return None
+
+        return last_roll[0]
+
+    def update_last_roll(self, id_server, id_member):
+        c = self.db.cursor()
+        self.create_member_information_if_not_exist(id_server, id_member)
+        c.execute('''UPDATE MemberInformation
+                     SET last_roll = datetime('now', 'localtime')
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        self.db.commit()
+        c.close()
+
+    def get_nb_rolls(self, id_server, id_member):
+        c = self.db.cursor()
+        c.execute('''SELECT nb_rolls
+                     FROM MemberInformation
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        nb_rolls = c.fetchone()
+        c.close()
+
+        if not nb_rolls:
+            return 0
+
+        return nb_rolls[0]
+
+    def set_nb_rolls(self, id_server, id_member, value):
+        c = self.db.cursor()
+        self.create_member_information_if_not_exist(id_server, id_member)
+        c.execute('''UPDATE MemberInformation
+                     SET nb_rolls = ?
+                     WHERE id_server = ? AND id_member = ?''', (value, id_server, id_member))
+        self.db.commit()
+        c.close()
+
+    def get_rolls_per_hour(self, id_server):
+        self.create_server_if_not_exist(id_server)
+        c = self.db.cursor()
+        c.execute('''SELECT rolls_per_hour FROM Server WHERE id = ?''', (id_server,))
+        rolls_per_hour = c.fetchone()
+        c.close()
+
+        return rolls_per_hour[0]
+
+    def get_time_to_claim(self, id_server):
+        self.create_server_if_not_exist(id_server)
+        c = self.db.cursor()
+        c.execute('''SELECT time_to_claim FROM Server WHERE id = ?''', (id_server,))
+        time_to_claim = c.fetchone()
+        c.close()
+
+        return time_to_claim[0]
