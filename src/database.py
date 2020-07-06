@@ -5,7 +5,6 @@ These classes provide functions to access to data in idols and member database.
 """
 
 import sqlite3
-import datetime
 
 
 class DatabaseIdol:
@@ -39,7 +38,7 @@ class DatabaseIdol:
         return ids
 
     def get_idol_group_id(self, name, group):
-        """Return the idol with name and group or None otherwise"""
+        """Return the idol with name and group or None otherwise."""
         c = self.db.cursor()
         c.execute('''SELECT I.id FROM Idol AS I
                      JOIN IdolGroups AS IG ON IG.id_idol = I.id 
@@ -65,7 +64,7 @@ class DatabaseIdol:
         return members
 
     def get_random_idol_id(self):
-        """Return random idol id"""
+        """Return random idol id."""
         c = self.db.cursor()
         c.execute('''SELECT Idol.id
                      FROM Idol
@@ -78,7 +77,7 @@ class DatabaseIdol:
         return random_idol[0][0]
 
     def get_idol_information(self, id_idol):
-        """Return idol information with dict {name, group, image} format"""
+        """Return idol information with dict {name, group, image} format."""
         c = self.db.cursor()
         c.execute('''SELECT I.id, I.name, G.name, Image.url
                      FROM Idol AS I
@@ -132,7 +131,7 @@ class DatabaseDeck:
         self.create_server_if_not_exist(id_server)
         self.create_member_if_not_exist(id_member)
         c = self.db.cursor()
-        c.execute('''INSERT INTO Deck(id_server, id_idol, id_member) 
+        c.execute('''INSERT INTO Deck(id_server, id_idol, id_member)
                      VALUES(?, ?, ?)''', (id_server, id_idol, id_member))
         self.db.commit()
         c.close()
@@ -141,7 +140,7 @@ class DatabaseDeck:
 
     def update_last_claim(self, id_server, id_member):
         c = self.db.cursor()
-        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member) 
+        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member)
                      VALUES (?, ?)''', (id_server, id_member))
         c.execute('''UPDATE MemberInformation
                      SET last_claim = datetime('now', 'localtime')
@@ -159,7 +158,7 @@ class DatabaseDeck:
         return {'claim_interval': config[0], 'time_to_claim': config[1], 'rolls_per_hour': config[2]}
 
     def get_last_claim(self, id_server, id_member):
-        """Return last claim date or -1 otherwise"""
+        """Return last claim date or -1 otherwise."""
         c = self.db.cursor()
         c.execute('''SELECT last_claim
                      FROM MemberInformation
@@ -169,15 +168,15 @@ class DatabaseDeck:
 
         return last_claim[0]
 
-    def create_server_if_not_exist(self, id):
+    def create_server_if_not_exist(self, id_server):
         c = self.db.cursor()
-        c.execute('''INSERT OR IGNORE INTO Server(id) VALUES (?)''', (id,))
+        c.execute('''INSERT OR IGNORE INTO Server(id) VALUES (?)''', (id_server,))
         self.db.commit()
         c.close()
 
-    def create_member_if_not_exist(self, id):
+    def create_member_if_not_exist(self, id_member):
         c = self.db.cursor()
-        c.execute('''INSERT OR IGNORE INTO Member(id) VALUES (?)''', (id,))
+        c.execute('''INSERT OR IGNORE INTO Member(id) VALUES (?)''', (id_member,))
         self.db.commit()
         c.close()
 
@@ -216,7 +215,7 @@ class DatabaseDeck:
         c.close()
 
     def get_user_deck(self, id_server, id_member):
-        """Return a list of idol ids"""
+        """Return a list of idol ids."""
         c = self.db.cursor()
         c.execute('''SELECT id_idol
                      FROM Deck
@@ -226,7 +225,7 @@ class DatabaseDeck:
         return [id_idol[0] for id_idol in ids]
 
     def get_last_roll(self, id_server, id_member):
-        """Return last roll date or None otherwise"""
+        """Return last roll date or None otherwise."""
         c = self.db.cursor()
         c.execute('''SELECT last_roll
                      FROM MemberInformation

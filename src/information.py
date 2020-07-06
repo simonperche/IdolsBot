@@ -1,8 +1,8 @@
-import discord
-import asyncio
 import secrets
 
+import discord
 from discord.ext import commands
+
 from database import DatabaseIdol
 
 

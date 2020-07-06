@@ -1,10 +1,11 @@
 import secrets
-import discord
 import asyncio
 from datetime import datetime
 
-from database import DatabaseIdol, DatabaseDeck
+import discord
 from discord.ext import commands
+
+from database import DatabaseIdol, DatabaseDeck
 
 
 class Roll(commands.Cog):

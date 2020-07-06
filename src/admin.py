@@ -1,10 +1,8 @@
 import discord
-import asyncio
-
 from discord.ext import commands
 from discord.ext.commands import has_permissions
-from database import DatabaseDeck
 
+from database import DatabaseDeck
 
 class Admin(commands.Cog):
     def __init__(self, bot):
