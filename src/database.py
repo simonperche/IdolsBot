@@ -5,6 +5,7 @@ These classes provide functions to access to data in idols and member database.
 """
 
 import sqlite3
+import datetime
 
 
 class DatabaseIdol:
@@ -97,7 +98,7 @@ class DatabaseDeck:
     def create_if_not_exist(self):
         c = self.db.cursor()
         # Query to check if the schema exists
-        c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='Server' ''')
+        c.execute('''SELECT count(name) FROM sqlite_master WHERE type='table' AND name='Server' ''')
 
         if c.fetchone()[0] != 1:
             with open('create_database_deck.sql', 'r') as f:
@@ -114,5 +115,54 @@ class DatabaseDeck:
             self.db.close()
         self.db = sqlite3.connect(filename)
 
-    def add_to_deck(self, id_server, id_idol, id_user):
-        print("add_to_deck : WIP")
+    def add_to_deck(self, id_server, id_idol, id_member):
+        self.create_server_if_not_exist(id_server)
+        self.create_member_if_not_exist(id_member)
+        c = self.db.cursor()
+        c.execute('''INSERT INTO Deck(id_server, id_idol, id_member) 
+                     VALUES(?, ?, ?)''', (id_server, id_idol, id_member))
+        self.db.commit()
+        c.close()
+
+        self.update_last_claim(id_server, id_member)
+
+    def update_last_claim(self, id_server, id_member):
+        c = self.db.cursor()
+        c.execute('''INSERT OR IGNORE INTO LastClaim(id_server, id_member) VALUES (?, ?)''', (id_server, id_member))
+        c.execute('''UPDATE LastClaim 
+                     SET last_claim = datetime('now', 'localtime') 
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        self.db.commit()
+        c.close()
+
+    def get_claim_interval(self, id_server):
+        c = self.db.cursor()
+        c.execute('''SELECT claim_interval FROM Server WHERE id = ?''', (id_server,))
+        claim_interval = c.fetchone()
+        c.close()
+
+        return claim_interval[0]
+
+    def get_last_claim(self, id_server, id_member):
+        """Return last claim date or -1 otherwise"""
+        c = self.db.cursor()
+        c.execute('''SELECT last_claim FROM LastClaim WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        last_claim = c.fetchone()
+        c.close()
+
+        if not last_claim:
+            return -1
+
+        return last_claim[0]
+
+    def create_server_if_not_exist(self, id):
+        c = self.db.cursor()
+        c.execute('''INSERT OR IGNORE INTO Server(id) VALUES (?)''', (id,))
+        self.db.commit()
+        c.close()
+
+    def create_member_if_not_exist(self, id):
+        c = self.db.cursor()
+        c.execute('''INSERT OR IGNORE INTO Member(id) VALUES (?)''', (id,))
+        self.db.commit()
+        c.close()

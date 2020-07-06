@@ -1,8 +1,9 @@
 import secrets
 import discord
 import asyncio
-from database import DatabaseIdol, DatabaseDeck
+from datetime import datetime
 
+from database import DatabaseIdol, DatabaseDeck
 from discord.ext import commands
 
 
@@ -31,16 +32,50 @@ class Roll(commands.Cog):
         def check(reaction, user):
             return user != self.bot.user and str(reaction.emoji) == '\N{TWO HEARTS}' and reaction.message.id == msg.id
 
-        try:
-            _, user = await self.bot.wait_for('reaction_add', timeout=Roll.CLAIM_TIMEOUT, check=check)
-        except asyncio.TimeoutError:
-            # Temporary message
-            await ctx.send('Too late to claim ' + idol['name'] + '...')
+        is_claimed_or_timeout = False
+
+        while not is_claimed_or_timeout:
+            try:
+                _, user = await self.bot.wait_for('reaction_add', timeout=Roll.CLAIM_TIMEOUT, check=check)
+            except asyncio.TimeoutError:
+                # Temporary message
+                await ctx.send('Too late to claim ' + idol['name'] + '...')
+                is_claimed_or_timeout = True
+            else:
+                is_claimed_or_timeout = await claim(ctx, user, idol)
+
+
+#### Utilities functions ####
+
+async def claim(ctx, user, idol):
+    """Add idol to user's deck if he can claim."""
+    id_server = ctx.guild.id
+    can_claim = False
+
+    last_claim = DatabaseDeck.get().get_last_claim(id_server, user.id)
+
+    time_until_claim = 0
+
+    # User never claimed an idol
+    if last_claim == -1:
+        can_claim = True
+    else:
+        claim_interval = DatabaseDeck.get().get_claim_interval(id_server)
+        date_last_claim = datetime.strptime(last_claim, '%Y-%m-%d %H:%M:%S')
+        minute_since_last_claim = divmod((datetime.now() - date_last_claim).seconds, 60)[0]
+
+        if minute_since_last_claim >= claim_interval:
+            can_claim = True
         else:
-            await self.claim(ctx, user, idol)
+            time_until_claim = claim_interval - minute_since_last_claim
 
-    #### Utilities functions ####
+    username = user.name if user.nick is None else user.nick
+    if can_claim:
+        DatabaseDeck.get().add_to_deck(id_server, idol['id'], user.id)
+        await ctx.send(f'{username} claims {idol["name"]}!')
+    else:
+        time = divmod(time_until_claim, 60)
+        await ctx.send(f'{username}, you can\'t claim right now. '
+                       f'Please wait {str(time[0])}h{str(time[1])}min.')
 
-    async def claim(self, ctx, user, idol):
-        DatabaseDeck.get().add_to_deck(ctx.guild.id, idol['id'], user.id)
-        await ctx.send(user.name + ' claims ' + idol['name'] + '!')
+    return can_claim
