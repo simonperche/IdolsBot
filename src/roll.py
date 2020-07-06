@@ -86,6 +86,7 @@ async def claim(ctx, user, idol):
         else:
             time_until_claim = claim_interval - minute_since_last_claim
 
+    # TODO: check if idol belongs to another player
     username = user.name if user.nick is None else user.nick
     if can_claim:
         DatabaseDeck.get().add_to_deck(id_server, idol['id'], user.id)

@@ -11,11 +11,28 @@ A [Mudae](https://top.gg/bot/432610292342587392) like bot only for KPop idols.
 |----------------------------|--------------|
 | Create database            | Done         |
 | Roll random idol           | Done         |
-| See information            | In dev       |
+| See information about idol | In dev       |
 | Wishlist                   | In dev       |
 | Trade                      | To do        |
 | Monetary system            | To do        |
 | Custom groups and idols    | To do        |
+
+## Commands
+
+Commands are separated in multiple [Cogs](https://discordpy.readthedocs.io/en/latest/ext/commands/cogs.html) to add clarity and organization in the code.
+
+| Category                   | Command *param* [opt_param]     | Description                                                | Alias       |
+|----------------------------|---------------------------------|------------------------------------------------------------|-------------|
+| **Roll**                   | roll                            | Roll a random idol                                         |             |
+| **Information**            | information *name* [group]      | Show information about an idol                             | info        |
+|                            | list *group*                    | List all members of a group                                |             |
+| **Profile**                | profile [mention_user]          | Show the profile (the deck) of a member                    | pr          |
+| **Admin**                  | set_claiming_interval *minutes* | Set the claiming interval in minutes for this server       |             |
+|                            | set_nb_rolls_per_hour *number*  | Set the number of rolls per hour for this server           |             |
+|                            | set_time_to_claim *seconds*     | Set the time to claim an idol (in seconds) for this server |             |
+|                            | show_configuration              | Show the configuration of this server                      | show_config |
+| **Utilities**              | help                            | Display the help                                           |             |
+|                            | ping                            | Ping the bot to see if it's active                         |             |
 
 
 ## Creating necessary files
