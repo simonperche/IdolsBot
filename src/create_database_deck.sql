@@ -1,7 +1,7 @@
 CREATE TABLE Server (
 id INT PRIMARY KEY,
 claim_interval INT DEFAULT 180, --in minutes
-time_to_claim INT DEFAULT 30, -- in seconds
+time_to_claim INT DEFAULT 15, -- in seconds
 rolls_per_hour INT DEFAULT 5
 );
 

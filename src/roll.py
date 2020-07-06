@@ -9,8 +9,6 @@ from database import DatabaseIdol, DatabaseDeck
 
 
 class Roll(commands.Cog):
-    CLAIM_TIMEOUT = 5.0
-
     def __init__(self, bot):
         """Initial the cog with the bot."""
         self.bot = bot
@@ -51,10 +49,11 @@ class Roll(commands.Cog):
             return user != self.bot.user and str(reaction.emoji) == emoji and reaction.message.id == msg.id
 
         is_claimed_or_timeout = False
+        claim_timeout = DatabaseDeck.get().get_server_configuration(ctx.guild.id)["time_to_claim"]
 
         while not is_claimed_or_timeout:
             try:
-                _, user = await self.bot.wait_for('reaction_add', timeout=Roll.CLAIM_TIMEOUT, check=check)
+                _, user = await self.bot.wait_for('reaction_add', timeout=claim_timeout, check=check)
             except asyncio.TimeoutError:
                 await msg.remove_reaction(emoji, self.bot.user)
                 is_claimed_or_timeout = True
