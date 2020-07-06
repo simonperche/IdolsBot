@@ -182,7 +182,7 @@ class DatabaseDeck:
 
     def create_member_information_if_not_exist(self, id_server, id_member):
         c = self.db.cursor()
-        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member) 
+        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member)
                                      VALUES (?, ?)''', (id_server, id_member))
         self.db.commit()
         c.close()

@@ -34,6 +34,10 @@ class Roll(commands.Cog):
         user_nb_rolls = DatabaseDeck.get().get_nb_rolls(ctx.guild.id, ctx.author.id)
         DatabaseDeck.get().set_nb_rolls(ctx.guild.id, ctx.author.id, user_nb_rolls + 1)
 
+        max_rolls = DatabaseDeck.get().get_rolls_per_hour(ctx.guild.id)
+        if max_rolls - user_nb_rolls - 1 == 2:
+            await ctx.send(f'**{ctx.author.name}**, 2 uses left.')
+
         embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
         embed.set_image(url=idol['image'])
 
@@ -95,7 +99,7 @@ async def claim(ctx, user, idol):
 
 
 def min_until_next_roll(id_server, id_user):
-    """Return minutes until next roll (0 if the user can roll now)"""
+    """Return minutes until next roll (0 if the user can roll now)."""
     last_roll = DatabaseDeck.get().get_last_roll(id_server, id_user)
 
     if not last_roll:
