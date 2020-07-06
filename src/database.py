@@ -141,8 +141,8 @@ class DatabaseDeck:
 
     def update_last_claim(self, id_server, id_member):
         c = self.db.cursor()
-        c.execute('''INSERT OR IGNORE INTO LastClaim(id_server, id_member) VALUES (?, ?)''', (id_server, id_member))
-        c.execute('''UPDATE LastClaim 
+        c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member) VALUES (?, ?)''', (id_server, id_member))
+        c.execute('''UPDATE MemberInformation 
                      SET last_claim = datetime('now', 'localtime') 
                      WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
         self.db.commit()
@@ -159,7 +159,7 @@ class DatabaseDeck:
     def get_last_claim(self, id_server, id_member):
         """Return last claim date or -1 otherwise"""
         c = self.db.cursor()
-        c.execute('''SELECT last_claim FROM LastClaim WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        c.execute('''SELECT last_claim FROM MemberInformation WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
         last_claim = c.fetchone()
         c.close()
 
