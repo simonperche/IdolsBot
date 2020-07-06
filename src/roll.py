@@ -1,7 +1,7 @@
 import secrets
 import discord
 import asyncio
-from database import DatabaseIdol
+from database import DatabaseIdol, DatabaseDeck
 
 from discord.ext import commands
 
@@ -37,5 +37,10 @@ class Roll(commands.Cog):
             # Temporary message
             await ctx.send('Too late to claim ' + idol['name'] + '...')
         else:
-            # Temporary message. Will add to deck if user is able to claim.
-            await ctx.send(user.name + ' claims ' + idol['name'] + ' !')
+            await self.claim(ctx, user, idol)
+
+    #### Utilities functions ####
+
+    async def claim(self, ctx, user, idol):
+        DatabaseDeck.get().add_to_deck(ctx.guild.id, idol['id'], user.id)
+        await ctx.send(user.name + ' claims ' + idol['name'] + '!')

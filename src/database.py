@@ -20,10 +20,11 @@ class DatabaseIdol:
         """Virtually private constructor."""
         if DatabaseIdol.__instance is None:
             DatabaseIdol.__instance = self
-            self.db = sqlite3.connect('./database.db')
+            self.db = sqlite3.connect('./database_idol.db')
 
     def connect(self, filename):
-        self.db.close()
+        if self.db:
+            self.db.close()
         self.db = sqlite3.connect(filename)
 
     def get_idol_ids(self, name):
@@ -65,7 +66,7 @@ class DatabaseIdol:
     def get_idol_information(self, id_idol):
         """Return idol information with dict {name, group, image} format"""
         c = self.db.cursor()
-        c.execute('''SELECT I.name, G.name, Image.url
+        c.execute('''SELECT I.id, I.name, G.name, Image.url
                      FROM Idol AS I
                      JOIN IdolGroups AS IG ON IG.id_idol = I.id
                      JOIN Groups AS G ON IG.id_groups = G.id
@@ -74,6 +75,44 @@ class DatabaseIdol:
         idol = c.fetchall()[0]
         c.close()
 
-        return {'name': idol[0], 'group': idol[1], 'image': idol[2]}
+        return {'id': idol[0], 'name': idol[1], 'group': idol[2], 'image': idol[3]}
 
 
+class DatabaseDeck:
+    __instance = None
+
+    @staticmethod
+    def get():
+        if DatabaseDeck.__instance is None:
+            DatabaseDeck()
+        return DatabaseDeck.__instance
+
+    def __init__(self):
+        """Virtually private constructor."""
+        if DatabaseDeck.__instance is None:
+            DatabaseDeck.__instance = self
+            self.db = sqlite3.connect('./database_deck.db')
+            self.create_if_not_exist()
+
+    def create_if_not_exist(self):
+        c = self.db.cursor()
+        # Query to check if the schema exists
+        c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='Server' ''')
+
+        if c.fetchone()[0] != 1:
+            with open('create_database_deck.sql', 'r') as f:
+                print("Creating database deck schema...")
+                query = f.read()
+
+                c = self.db.cursor()
+                c.executescript(query)
+                self.db.commit()
+                c.close()
+
+    def connect(self, filename):
+        if self.db:
+            self.db.close()
+        self.db = sqlite3.connect(filename)
+
+    def add_to_deck(self, id_server, id_idol, id_user):
+        print("add_to_deck : WIP")

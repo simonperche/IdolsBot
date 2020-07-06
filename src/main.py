@@ -11,6 +11,7 @@ bot = commands.Bot(command_prefix='*')
 
 bot.add_cog(Roll(bot))
 
+
 #### Bot commands ####
 
 @bot.command()
