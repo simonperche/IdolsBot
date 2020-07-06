@@ -15,25 +15,18 @@ class Information(commands.Cog):
 
     @commands.command(aliases=['info'], description='Show information about an idol. '
                                                     'Please enter the name of the idol '
-                                                    'with group in parentheses (optional).\n'
+                                                    'with group (optional). Please add ""'
+                                                    'if it has spaces\n'
                                                     'Take the first corresponding idol.'
-                                                    'See list command for all idols.')
-    async def information(self, ctx, *, parameters):
-        # Parse parameters
-        first_parenthesis = parameters.find('(')
-        last_parenthesis = parameters.rfind(')')
-
-        name = ''
-        group = ''
-
-        if first_parenthesis != -1 and last_parenthesis != -1:
-            group = parameters[first_parenthesis + 1:last_parenthesis]
-            name = parameters[0:first_parenthesis]
-        else:
-            name = parameters
-
+                                                    'See list command for all idols.\n'
+                                                    'Example:\n'
+                                                    '   *info heejin loona'
+                                                    '   *info joy "red velvet"')
+    async def information(self, ctx, name, group=None):
         name = name.strip()
-        group = group.strip()
+
+        if group:
+            group = group.strip()
 
         id_idol = None
 
