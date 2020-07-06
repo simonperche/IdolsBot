@@ -23,6 +23,7 @@ class Information(commands.Cog):
                                                     '   *info heejin loona'
                                                     '   *info joy "red velvet"')
     async def information(self, ctx, name, group=None):
+        # TODO: add more information to the card (all groups...)
         name = name.strip()
 
         if group:
@@ -53,4 +54,16 @@ class Information(commands.Cog):
         # TODO: add pages to go through images
         embed.set_image(url=idol['image'])
 
+        await ctx.send(embed=embed)
+
+    @commands.command(description='List all idols with its name')
+    async def list(self, ctx, *, name):
+        ids = DatabaseIdol.get().get_idol_ids(name)
+
+        description = '' if ids else 'No idols found'
+        for id_idol in ids:
+            idol = DatabaseIdol.get().get_idol_information(id_idol)
+            description += f'**{idol["name"]}** *{idol["group"]}*\n'
+
+        embed = discord.Embed(title=f'{name} idols', description=description)
         await ctx.send(embed=embed)
