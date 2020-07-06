@@ -27,10 +27,11 @@ class Roll(commands.Cog):
         embed.set_image(url=idol['image'])
 
         msg = await ctx.send(embed=embed)
-        await msg.add_reaction('\N{TWO HEARTS}')
+        emoji = '\N{TWO HEARTS}'
+        await msg.add_reaction(emoji)
 
         def check(reaction, user):
-            return user != self.bot.user and str(reaction.emoji) == '\N{TWO HEARTS}' and reaction.message.id == msg.id
+            return user != self.bot.user and str(reaction.emoji) == emoji and reaction.message.id == msg.id
 
         is_claimed_or_timeout = False
 
@@ -39,7 +40,7 @@ class Roll(commands.Cog):
                 _, user = await self.bot.wait_for('reaction_add', timeout=Roll.CLAIM_TIMEOUT, check=check)
             except asyncio.TimeoutError:
                 # Temporary message
-                await ctx.send('Too late to claim ' + idol['name'] + '...')
+                await msg.remove_reaction(emoji, self.bot.user)
                 is_claimed_or_timeout = True
             else:
                 is_claimed_or_timeout = await claim(ctx, user, idol)
