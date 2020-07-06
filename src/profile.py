@@ -22,7 +22,7 @@ class Profile(commands.Cog):
         description = ''
         for id_idol in ids_deck:
             idol = DatabaseIdol.get().get_idol_information(id_idol)
-            description += f'*{idol["name"]}* \t\t({idol["group"]})\n'
+            description += f'**{idol["name"]}** (*{idol["group"]}*)\n'
 
         embed = discord.Embed(title=user.name if user.nick is None else user.nick, description=description)
         embed.set_thumbnail(url=user.avatar_url)

@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from roll import Roll
 from admin import Admin
 from profile import Profile
+from information import Information
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -14,6 +15,7 @@ bot = commands.Bot(command_prefix='*')
 bot.add_cog(Roll(bot))
 bot.add_cog(Admin(bot))
 bot.add_cog(Profile(bot))
+bot.add_cog(Information(bot))
 
 
 #### Bot commands ####

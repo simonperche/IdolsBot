@@ -38,6 +38,19 @@ class DatabaseIdol:
 
         return ids
 
+    def get_idol_group_id(self, name, group):
+        """Return the idol with name and group or None otherwise"""
+        c = self.db.cursor()
+        c.execute('''SELECT I.id FROM Idol AS I
+                     JOIN IdolGroups AS IG ON IG.id_idol = I.id 
+                     JOIN Groups AS G ON IG.id_groups = G.id
+                     WHERE G.name = ? COLLATE NOCASE
+                     AND I.name = ? COLLATE NOCASE''', (group, name))
+        id_idol = c.fetchone()
+        c.close()
+
+        return id_idol[0] if id_idol else None
+
     def get_group_members(self, group_name):
         c = self.db.cursor()
         c.execute('''SELECT I.name FROM Idol AS I
