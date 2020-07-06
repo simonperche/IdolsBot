@@ -25,7 +25,7 @@ Commands are separated in multiple [Cogs](https://discordpy.readthedocs.io/en/la
 |----------------------------|---------------------------------|------------------------------------------------------------|-------------|
 | **Roll**                   | roll                            | Roll a random idol                                         |             |
 | **Information**            | information *name* [group]      | Show information about an idol                             | info        |
-|                            | list *group*                    | List all members of a group                                |             |
+|                            | list *name*                     | List all idols with this name                              |             |
 | **Profile**                | profile [mention_user]          | Show the profile (the deck) of a member                    | pr          |
 | **Admin**                  | set_claiming_interval *minutes* | Set the claiming interval in minutes for this server       |             |
 |                            | set_nb_rolls_per_hour *number*  | Set the number of rolls per hour for this server           |             |
