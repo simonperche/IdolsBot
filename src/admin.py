@@ -19,9 +19,47 @@ class Admin(commands.Cog):
         try:
             interval = int(interval)
         except ValueError:
-            await ctx.send('Please enter as minutes as number.')
+            await ctx.send('Please enter minutes as number.')
             await ctx.message.add_reaction(u"\u274C")
             return
 
         DatabaseDeck.get().set_claiming_interval(ctx.guild.id, interval)
         await ctx.message.add_reaction(u"\u2705")
+
+    @commands.command(description='Set the number of rolls per hour for all users.')
+    @has_permissions(administrator=True)
+    async def set_nb_rolls_per_hour(self, ctx, nb_rolls):
+        try:
+            nb_rolls = int(nb_rolls)
+        except ValueError:
+            await ctx.send('Please enter number of rolls as number.')
+            await ctx.message.add_reaction(u"\u274C")
+            return
+
+        DatabaseDeck.get().set_nb_rolls_per_hour(ctx.guild.id, nb_rolls)
+        await ctx.message.add_reaction(u"\u2705")
+
+    @commands.command(description='Set the amount of time to claim (in seconds) for all users.')
+    @has_permissions(administrator=True)
+    async def set_time_to_claim(self, ctx, time_to_claim):
+        try:
+            time_to_claim = int(time_to_claim)
+        except ValueError:
+            await ctx.send('Please enter time to claim as number.')
+            await ctx.message.add_reaction(u"\u274C")
+            return
+
+        DatabaseDeck.get().set_time_to_claim(ctx.guild.id, time_to_claim)
+        await ctx.message.add_reaction(u"\u2705")
+
+    @commands.command(aliases=['show_config'], description='Show the current configuration of the bot for this server.')
+    @has_permissions(administrator=True)
+    async def show_configuration(self, ctx):
+        config = DatabaseDeck.get().get_server_configuration(ctx.guild.id)
+
+        description = f'Claim interval: {config["claim_interval"]} minutes\n' \
+                      f'Time to claim an idol: {config["time_to_claim"]} seconds\n' \
+                      f'Number of rolls per hour: {config["rolls_per_hour"]}'
+
+        embed = discord.Embed(title=f'Server *{ctx.guild.name}* configuration', description=description)
+        await ctx.send(embed=embed)

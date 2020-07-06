@@ -149,13 +149,14 @@ class DatabaseDeck:
         self.db.commit()
         c.close()
 
-    def get_claim_interval(self, id_server):
+    def get_server_configuration(self, id_server):
+        self.create_server_if_not_exist(id_server)
         c = self.db.cursor()
-        c.execute('''SELECT claim_interval FROM Server WHERE id = ?''', (id_server,))
-        claim_interval = c.fetchone()
+        c.execute('''SELECT claim_interval, time_to_claim, rolls_per_hour FROM Server WHERE id = ?''', (id_server,))
+        config = c.fetchone()
         c.close()
 
-        return claim_interval[0]
+        return {'claim_interval': config[0], 'time_to_claim': config[1], 'rolls_per_hour': config[2]}
 
     def get_last_claim(self, id_server, id_member):
         """Return last claim date or -1 otherwise"""
@@ -193,6 +194,24 @@ class DatabaseDeck:
         c.execute('''UPDATE Server
                      SET claim_interval = ?
                      WHERE id = ?''', (interval, id_server))
+        self.db.commit()
+        c.close()
+
+    def set_nb_rolls_per_hour(self, id_server, nb_rolls):
+        self.create_server_if_not_exist(id_server)
+        c = self.db.cursor()
+        c.execute('''UPDATE Server
+                     SET rolls_per_hour = ?
+                     WHERE id = ?''', (nb_rolls, id_server))
+        self.db.commit()
+        c.close()
+
+    def set_time_to_claim(self, id_server, time_to_claim):
+        self.create_server_if_not_exist(id_server)
+        c = self.db.cursor()
+        c.execute('''UPDATE Server
+                     SET time_to_claim = ?
+                     WHERE id = ?''', (time_to_claim, id_server))
         self.db.commit()
         c.close()
 

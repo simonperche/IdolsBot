@@ -72,7 +72,7 @@ async def claim(ctx, user, idol):
     if not last_claim:
         can_claim = True
     else:
-        claim_interval = DatabaseDeck.get().get_claim_interval(id_server)
+        claim_interval = DatabaseDeck.get().get_server_configuration(id_server)['claim_interval']
         date_last_claim = datetime.strptime(last_claim, '%Y-%m-%d %H:%M:%S')
         minute_since_last_claim = divmod((datetime.now() - date_last_claim).seconds, 60)[0]
 
