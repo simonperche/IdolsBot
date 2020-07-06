@@ -73,7 +73,7 @@ class DatabaseIdol:
                      JOIN Groups AS G ON IG.id_groups = G.id
                      JOIN Image ON Image.id_idol = I.id
                      WHERE I.id = ?''', (id_idol,))
-        idol = c.fetchall()[0]
+        idol = c.fetchone()
         c.close()
 
         return {'id': idol[0], 'name': idol[1], 'group': idol[2], 'image': idol[3]}
@@ -175,3 +175,13 @@ class DatabaseDeck:
                      WHERE id = ?''', (interval, id_server))
         self.db.commit()
         c.close()
+
+    def get_user_deck(self, id_server, id_member):
+        """Return a list of idol ids"""
+        c = self.db.cursor()
+        c.execute('''SELECT id_idol 
+                     FROM Deck 
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        ids = c.fetchall()
+        c.close()
+        return [id_idol[0] for id_idol in ids]
