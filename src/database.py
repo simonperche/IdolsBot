@@ -166,3 +166,12 @@ class DatabaseDeck:
         c.execute('''INSERT OR IGNORE INTO Member(id) VALUES (?)''', (id,))
         self.db.commit()
         c.close()
+
+    def set_claiming_interval(self, id_server, interval):
+        self.create_server_if_not_exist(id_server)
+        c = self.db.cursor()
+        c.execute('''UPDATE Server 
+                     SET claim_interval = ?
+                     WHERE id = ?''', (interval, id_server))
+        self.db.commit()
+        c.close()

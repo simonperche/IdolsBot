@@ -76,6 +76,6 @@ async def claim(ctx, user, idol):
     else:
         time = divmod(time_until_claim, 60)
         await ctx.send(f'{username}, you can\'t claim right now. '
-                       f'Please wait {str(time[0])}h{str(time[1])}min.')
+                       f'Please wait {str(time[0])} h {str(time[1])} min.')
 
     return can_claim
