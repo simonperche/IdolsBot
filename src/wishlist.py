@@ -37,7 +37,16 @@ class Wishlist(commands.Cog):
 
         if not id_idol:
             await ctx.message.add_reaction(u"\u274C")
-            await ctx.send(f'Idol {name}{" from " + group + " " if group else ""} not found.')
+            await ctx.send(f'Idol **{name}**{" from *" + group + "* " if group else ""} not found.')
+            return
+
+        nb_wish = DatabaseDeck.get().get_nb_wish(ctx.guild.id, ctx.author.id)
+        max_wish = DatabaseDeck.get().get_max_wish(ctx.guild.id, ctx.author.id)
+
+        if nb_wish >= max_wish:
+            # Red cross
+            await ctx.message.add_reaction(u"\u274C")
+            await ctx.send('Your wish list is full!')
             return
 
         if DatabaseDeck.get().add_to_wishlist(ctx.guild.id, id_idol, ctx.author.id):
