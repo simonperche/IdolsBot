@@ -12,7 +12,7 @@ A [Mudae](https://top.gg/bot/432610292342587392) like bot only for KPop idols.
 | Create database            | Done         |
 | Roll random idol           | Done         |
 | See information about idol | In dev       |
-| Wishlist                   | In dev       |
+| Wishlist                   | Done         |
 | Trade                      | To do        |
 | Monetary system            | To do        |
 | Custom groups and idols    | To do        |
