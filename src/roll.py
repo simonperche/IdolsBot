@@ -28,6 +28,19 @@ class Roll(commands.Cog):
             ctx.send("An error occurred. If this message is exceptional, "
                      "please try again. Otherwise, contact the administrator.")
 
+        # Mention users if they wish for this idol
+        id_members = DatabaseDeck.get().get_wished_by(ctx.guild.id, id_idol)
+
+        wish_msg = ''
+        for id_member in id_members:
+            member = ctx.guild.get_member(id_member)
+            # Could be None if the user left the server
+            if member:
+                wish_msg += f'{member.mention} '
+
+        if wish_msg:
+            await ctx.send(f'Wished by {wish_msg}')
+
         # Update roll information in database
         DatabaseDeck.get().update_last_roll(ctx.guild.id, ctx.author.id)
         user_nb_rolls = DatabaseDeck.get().get_nb_rolls(ctx.guild.id, ctx.author.id)
@@ -41,7 +54,6 @@ class Roll(commands.Cog):
         embed.set_image(url=idol['image'])
 
         id_owner = DatabaseDeck.get().idol_belongs_to(ctx.guild.id, id_idol)
-
         if id_owner:
             owner = ctx.guild.get_member(id_owner)
 

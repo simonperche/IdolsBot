@@ -4,7 +4,6 @@ from discord.ext import commands
 from database import DatabaseIdol, DatabaseDeck
 
 
-
 class Wishlist(commands.Cog):
     def __init__(self, bot):
         """Initial the cog with the bot."""
@@ -13,13 +12,13 @@ class Wishlist(commands.Cog):
     #### Commands ####
 
     @commands.command(description='Add an idol to your wish list.'
-                                                    'Please add "" if it has spaces\n'
-                                                    'Take the first corresponding idol.'
-                                                    'See list command for all idols.\n'
-                                                    'Example:\n'
-                                                    '   *wish rm'
-                                                    '   *wish heejin loona'
-                                                    '   *wish joy "red velvet"')
+                                  'Please add "" if it has spaces\n'
+                                  'Take the first corresponding idol.'
+                                  'See list command for all idols.\n'
+                                  'Example:\n'
+                                  '   *wish rm'
+                                  '   *wish heejin loona'
+                                  '   *wish joy "red velvet"')
     async def wish(self, ctx, name, group=None):
         name = name.strip()
 
@@ -91,7 +90,7 @@ class Wishlist(commands.Cog):
             await ctx.message.add_reaction(u"\u274C")
             await ctx.send('You don\'t have this idol in your wish list.')
 
-    @commands.command(aliases=['wl'], description='Show your wishlist')
+    @commands.command(aliases=['wl'], description='Show your wishlist.')
     async def wishlist(self, ctx):
         ids = DatabaseDeck.get().get_wishlist(ctx.guild.id, ctx.author.id)
 
@@ -106,4 +105,4 @@ class Wishlist(commands.Cog):
             description += f'**{idol["name"]}** *{idol["group"]}*\n'
 
         await ctx.send(embed=discord.Embed(title=f'Wish list of {username} ({nb_wish}/{max_wish})',
-                                     description=description))
+                                           description=description))

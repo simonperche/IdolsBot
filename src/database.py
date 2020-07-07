@@ -369,7 +369,7 @@ class DatabaseDeck:
         return nb_wish
 
     def get_wishlist(self, id_server, id_member):
-        """Return wish list of user as ids array"""
+        """Return wish list of idols as ids array, or [] otherwise."""
         c = self.db.cursor()
         c.execute('''SELECT id_idol
                      FROM Wishlist
@@ -380,3 +380,16 @@ class DatabaseDeck:
         wishlist = [id_idol[0] for id_idol in wishlist]
 
         return wishlist
+
+    def get_wished_by(self, id_server, id_idol):
+        """Return wish list of users as ids array, or [] otherwise."""
+        c = self.db.cursor()
+        c.execute('''SELECT id_member
+                     FROM Wishlist
+                     WHERE id_server = ? AND id_idol = ?''', (id_server, id_idol))
+        members = c.fetchall()
+        c.close()
+
+        members = [id_member[0] for id_member in members]
+
+        return members
