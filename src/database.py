@@ -51,17 +51,23 @@ class DatabaseIdol:
         return id_idol[0] if id_idol else None
 
     def get_group_members(self, group_name):
+        """Return all group members with dict {name, members=[]}."""
         c = self.db.cursor()
-        c.execute('''SELECT I.name FROM Idol AS I
+        c.execute('''SELECT G.name, I.name FROM Idol AS I
                      JOIN IdolGroups AS IG ON IG.id_idol = I.id 
                      JOIN Groups AS G ON IG.id_groups = G.id
                      WHERE G.name = ? COLLATE NOCASE''', (group_name,))
         results = c.fetchall()
         c.close()
 
-        members = [r[0] for r in results]
+        group = {}
 
-        return members
+        if results:
+            # Name is used to get the right case of the group
+            group['name'] = results[0][0]
+            group['members'] = [r[1] for r in results]
+
+        return group
 
     def get_random_idol_id(self):
         """Return random idol id."""

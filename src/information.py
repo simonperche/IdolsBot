@@ -48,7 +48,6 @@ class Information(commands.Cog):
 
         idol = DatabaseIdol.get().get_idol_information(id_idol)
 
-        # TODO: Add message if idol belongs to a member
         embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
 
         id_owner = DatabaseDeck.get().idol_belongs_to(ctx.guild.id, id_idol)
@@ -76,4 +75,17 @@ class Information(commands.Cog):
             description += f'**{idol["name"]}** *{idol["group"]}*\n'
 
         embed = discord.Embed(title=f'{name} idols', description=description)
+        await ctx.send(embed=embed)
+
+    @commands.command(description='Show all members of a group')
+    async def group(self, ctx, *, group_name):
+        group = DatabaseIdol.get().get_group_members(group_name)
+
+        if not group:
+            ctx.send(f'No *{group_name}* group found.')
+            return
+
+        embed = discord.Embed(title=f'*{group["name"]}* group',
+                              description='\n'.join([f'**{member}**' for member in group['members']]))
+
         await ctx.send(embed=embed)
