@@ -314,7 +314,7 @@ class DatabaseDeck:
         is_success = True
 
         try:
-            c.execute('''INSERT 
+            c.execute('''INSERT
                          INTO Wishlist(id_server, id_idol, id_member) 
                          VALUES (?,?,?)''', (id_server, id_idol, id_member))
         except sqlite3.IntegrityError:
@@ -329,7 +329,7 @@ class DatabaseDeck:
         c = self.db.cursor()
 
         # If the idol is not in wish list
-        c.execute('''SELECT COUNT(*) FROM Wishlist 
+        c.execute('''SELECT COUNT(*) FROM Wishlist
                      WHERE id_server = ?
                      AND id_idol = ?
                      AND id_member = ?''', (id_server, id_idol, id_member))
@@ -337,7 +337,7 @@ class DatabaseDeck:
             c.close()
             return False
 
-        c.execute('''DELETE FROM Wishlist 
+        c.execute('''DELETE FROM Wishlist
                      WHERE id_server = ?
                      AND id_idol = ?
                      AND id_member = ?''', (id_server, id_idol, id_member))

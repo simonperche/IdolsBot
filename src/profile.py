@@ -20,6 +20,7 @@ class Profile(commands.Cog):
         ids_deck = DatabaseDeck.get().get_user_deck(ctx.guild.id, user.id)
 
         # TODO: handle long messages (>2000 letters) with pages
+        # TODO: show if idol is already claimed
         description = ''
         for id_idol in ids_deck:
             idol = DatabaseIdol.get().get_idol_information(id_idol)
