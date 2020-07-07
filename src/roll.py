@@ -68,50 +68,44 @@ class Roll(commands.Cog):
         while not is_claimed_or_timeout:
             try:
                 _, user = await self.bot.wait_for('reaction_add', timeout=claim_timeout, check=check)
+                username = user.name if user.nick is None else user.nick
             except asyncio.TimeoutError:
                 await msg.clear_reaction(emoji)
                 is_claimed_or_timeout = True
             else:
-                is_claimed_or_timeout = await claim(ctx, user, idol, msg, embed)
+                time_until_claim = min_until_next_claim(ctx.guild.id, user.id)
+                is_claimed_or_timeout = time_until_claim == 0
+
+                if is_claimed_or_timeout:
+                    DatabaseDeck.get().add_to_deck(ctx.guild.id, idol['id'], user.id)
+                    await ctx.send(f'{username} claims {idol["name"]}!')
+
+                    embed.set_footer(icon_url=user.avatar_url, text=f'Belongs to {username}')
+                    await msg.edit(embed=embed)
+                else:
+                    time = divmod(time_until_claim, 60)
+                    await ctx.send(f'{username}, you can\'t claim right now. ' +
+                                   f'Please wait **' + (str(time[0]) + 'h ' if time[0] != 0 else '') +
+                                   f'{str(time[1])} min**.')
 
 
 #### Utilities functions ####
 
-async def claim(ctx, user, idol, msg, embed):
-    """Add idol to user's deck if he can claim."""
-    id_server = ctx.guild.id
-    can_claim = False
-
-    last_claim = DatabaseDeck.get().get_last_claim(id_server, user.id)
+def min_until_next_claim(id_server, id_user):
+    """Return minutes until next claim (0 if the user can claim now)."""
+    last_claim = DatabaseDeck.get().get_last_claim(id_server, id_user)
 
     time_until_claim = 0
 
-    # User never claimed an idol
-    if not last_claim:
-        can_claim = True
-    else:
+    if last_claim:
         claim_interval = DatabaseDeck.get().get_server_configuration(id_server)['claim_interval']
         date_last_claim = datetime.strptime(last_claim, '%Y-%m-%d %H:%M:%S')
         minute_since_last_claim = divmod((datetime.now() - date_last_claim).seconds, 60)[0]
 
-        if minute_since_last_claim >= claim_interval:
-            can_claim = True
-        else:
+        if minute_since_last_claim < claim_interval:
             time_until_claim = claim_interval - minute_since_last_claim
 
-    username = user.name if user.nick is None else user.nick
-    if can_claim:
-        DatabaseDeck.get().add_to_deck(id_server, idol['id'], user.id)
-        await ctx.send(f'{username} claims {idol["name"]}!')
-
-        embed.set_footer(icon_url=user.avatar_url, text=f'Belongs to {username}')
-        await msg.edit(embed=embed)
-    else:
-        time = divmod(time_until_claim, 60)
-        await ctx.send(f'{username}, you can\'t claim right now. '
-                       f'Please wait {str(time[0])} h {str(time[1])} min.')
-
-    return can_claim
+    return time_until_claim
 
 
 def min_until_next_roll(id_server, id_user):
