@@ -69,7 +69,7 @@ class Roll(commands.Cog):
             try:
                 _, user = await self.bot.wait_for('reaction_add', timeout=claim_timeout, check=check)
             except asyncio.TimeoutError:
-                await msg.remove_reaction(emoji, self.bot.user)
+                await msg.clear_reaction(emoji)
                 is_claimed_or_timeout = True
             else:
                 is_claimed_or_timeout = await claim(ctx, user, idol, msg, embed)
