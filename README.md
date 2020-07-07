@@ -28,6 +28,9 @@ Commands are separated in multiple [Cogs](https://discordpy.readthedocs.io/en/la
 |                            | list *name*                     | List all idols with this name                              |             |
 | **Profile**                | profile [mention_user]          | Show the profile (the deck) of a member                    | pr          |
 |                            | time                            | Show claiming and rolling time reset                       | tu          |
+| **Wishlist**               | wish *name* [group]             | Add idol to your wish list                                 |             |
+|                            | wishremove *name* [group]       | Remove idol from your wish list                            |             |
+|                            | wishlist                        | Show your wish list                                        | wl          |
 | **Admin**                  | set_claiming_interval *minutes* | Set the claiming interval in minutes for this server       |             |
 |                            | set_nb_rolls_per_hour *number*  | Set the number of rolls per hour for this server           |             |
 |                            | set_time_to_claim *seconds*     | Set the time to claim an idol (in seconds) for this server |             |
