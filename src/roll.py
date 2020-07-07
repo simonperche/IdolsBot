@@ -22,7 +22,8 @@ class Roll(commands.Cog):
             await ctx.send(f'You cannot roll right now. The next roll reset is in {minutes} minutes.')
             return
 
-        idol = DatabaseIdol.get().get_idol_information(DatabaseIdol.get().get_random_idol_id())
+        id_idol = DatabaseIdol.get().get_random_idol_id()
+        idol = DatabaseIdol.get().get_idol_information(id_idol)
         if not idol:
             ctx.send("An error occurred. If this message is exceptional, "
                      "please try again. Otherwise, contact the administrator.")
@@ -39,9 +40,22 @@ class Roll(commands.Cog):
         embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
         embed.set_image(url=idol['image'])
 
-        # TODO: add footer 'belongs to'
+        id_owner = DatabaseDeck.get().idol_belongs_to(ctx.guild.id, id_idol)
+
+        if id_owner:
+            owner = ctx.guild.get_member(id_owner)
+
+            # Could be None if the user left the server
+            if owner:
+                embed.set_footer(icon_url=owner.avatar_url,
+                                 text=f'Belongs to {owner.name if not owner.nick else owner.nick}')
 
         msg = await ctx.send(embed=embed)
+
+        # Cannot claim if idol already claim
+        if id_owner:
+            return
+
         emoji = '\N{TWO HEARTS}'
         await msg.add_reaction(emoji)
 
@@ -58,12 +72,12 @@ class Roll(commands.Cog):
                 await msg.remove_reaction(emoji, self.bot.user)
                 is_claimed_or_timeout = True
             else:
-                is_claimed_or_timeout = await claim(ctx, user, idol)
+                is_claimed_or_timeout = await claim(ctx, user, idol, msg, embed)
 
 
 #### Utilities functions ####
 
-async def claim(ctx, user, idol):
+async def claim(ctx, user, idol, msg, embed):
     """Add idol to user's deck if he can claim."""
     id_server = ctx.guild.id
     can_claim = False
@@ -85,11 +99,13 @@ async def claim(ctx, user, idol):
         else:
             time_until_claim = claim_interval - minute_since_last_claim
 
-    # TODO: check if idol belongs to another player
     username = user.name if user.nick is None else user.nick
     if can_claim:
         DatabaseDeck.get().add_to_deck(id_server, idol['id'], user.id)
         await ctx.send(f'{username} claims {idol["name"]}!')
+
+        embed.set_footer(icon_url=user.avatar_url, text=f'Belongs to {username}')
+        await msg.edit(embed=embed)
     else:
         time = divmod(time_until_claim, 60)
         await ctx.send(f'{username}, you can\'t claim right now. '

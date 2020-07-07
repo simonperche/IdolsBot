@@ -286,3 +286,15 @@ class DatabaseDeck:
         c.close()
 
         return time_to_claim[0]
+
+    def idol_belongs_to(self, id_server, id_idol):
+        """Return the owner of the idol or None otherwise."""
+        c = self.db.cursor()
+        c.execute('''SELECT id_member FROM Deck WHERE id_server = ? AND id_idol = ?''', (id_server, id_idol))
+        owner = c.fetchone()
+        c.close()
+
+        if owner:
+            owner = owner[0]
+
+        return owner

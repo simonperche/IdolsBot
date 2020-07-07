@@ -3,7 +3,7 @@ import secrets
 import discord
 from discord.ext import commands
 
-from database import DatabaseIdol
+from database import DatabaseIdol, DatabaseDeck
 
 
 class Information(commands.Cog):
@@ -50,6 +50,16 @@ class Information(commands.Cog):
 
         # TODO: Add message if idol belongs to a member
         embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
+
+        id_owner = DatabaseDeck.get().idol_belongs_to(ctx.guild.id, id_idol)
+
+        if id_owner:
+            owner = ctx.guild.get_member(id_owner)
+
+            # Could be None if the user left the server
+            if owner:
+                embed.set_footer(icon_url=owner.avatar_url,
+                                 text=f'Belongs to {owner.name if not owner.nick else owner.nick}')
 
         # TODO: add pages to go through images
         embed.set_image(url=idol['image'])
