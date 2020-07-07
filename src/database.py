@@ -172,6 +172,9 @@ class DatabaseDeck:
         last_claim = c.fetchone()
         c.close()
 
+        if not last_claim:
+            return None
+
         return last_claim[0]
 
     def create_server_if_not_exist(self, id_server):
