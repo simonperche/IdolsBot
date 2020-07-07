@@ -16,6 +16,7 @@ id_member INT,
 last_claim TEXT DEFAULT NULL, -- date %Y-%m-%d %H:%M:%S
 nb_rolls INT DEFAULT 0,
 last_roll TEXT DEFAULT NULL, -- date %Y-%m-%d %H:%M:%S
+max_wish INT DEFAULT 5,
 FOREIGN KEY (id_server) REFERENCES Server(id),
 FOREIGN KEY (id_member) REFERENCES Member(id),
 PRIMARY KEY (id_server, id_member)

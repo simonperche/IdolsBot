@@ -35,7 +35,7 @@ class Roll(commands.Cog):
 
         max_rolls = DatabaseDeck.get().get_rolls_per_hour(ctx.guild.id)
         if max_rolls - user_nb_rolls - 1 == 2:
-            await ctx.send(f'**{ctx.author.name}**, 2 uses left.')
+            await ctx.send(f'**{ctx.author.name if ctx.author.nick is None else ctx.author.nick}**, 2 uses left.')
 
         embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
         embed.set_image(url=idol['image'])

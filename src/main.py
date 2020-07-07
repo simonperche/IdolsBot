@@ -7,6 +7,7 @@ from roll import Roll
 from admin import Admin
 from profile import Profile
 from information import Information
+from wishlist import Wishlist
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -16,7 +17,7 @@ bot.add_cog(Roll(bot))
 bot.add_cog(Admin(bot))
 bot.add_cog(Profile(bot))
 bot.add_cog(Information(bot))
-
+bot.add_cog(Wishlist(bot))
 
 #### Bot commands ####
 
@@ -45,7 +46,7 @@ async def on_command_error(ctx, error):
         await ctx.send("You're not authorized to execute this command.")
         return
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("Missing arguments. !help for display help")
+        await ctx.send("Missing arguments. *help for display help")
         return
     raise error
 

@@ -307,3 +307,76 @@ class DatabaseDeck:
             owner = owner[0]
 
         return owner
+
+    def add_to_wishlist(self, id_server, id_idol, id_member):
+        """Return true if success, false otherwise."""
+        c = self.db.cursor()
+        is_success = True
+
+        try:
+            c.execute('''INSERT 
+                         INTO Wishlist(id_server, id_idol, id_member) 
+                         VALUES (?,?,?)''', (id_server, id_idol, id_member))
+        except sqlite3.IntegrityError:
+            is_success = False
+        self.db.commit()
+        c.close()
+
+        return is_success
+
+    def remove_from_wishlist(self, id_server, id_idol, id_member):
+        """Return true if success, false otherwise."""
+        c = self.db.cursor()
+
+        # If the idol is not in wish list
+        c.execute('''SELECT COUNT(*) FROM Wishlist 
+                     WHERE id_server = ?
+                     AND id_idol = ?
+                     AND id_member = ?''', (id_server, id_idol, id_member))
+        if c.fetchone()[0] == 0:
+            c.close()
+            return False
+
+        c.execute('''DELETE FROM Wishlist 
+                     WHERE id_server = ?
+                     AND id_idol = ?
+                     AND id_member = ?''', (id_server, id_idol, id_member))
+
+        self.db.commit()
+        c.close()
+
+        return True
+
+    def get_max_wish(self, id_server, id_member):
+        self.create_member_information_if_not_exist(id_server, id_member)
+        c = self.db.cursor()
+        c.execute('''SELECT max_wish
+                     FROM MemberInformation
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        max_wish = c.fetchone()[0]
+        c.close()
+
+        return max_wish
+
+    def get_nb_wish(self, id_server, id_member):
+        c = self.db.cursor()
+        c.execute('''SELECT COUNT(id_idol)
+                     FROM Wishlist
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        nb_wish = c.fetchone()[0]
+        c.close()
+
+        return nb_wish
+
+    def get_wishlist(self, id_server, id_member):
+        """Return wish list of user as ids array"""
+        c = self.db.cursor()
+        c.execute('''SELECT id_idol
+                     FROM Wishlist
+                     WHERE id_server = ? AND id_member = ?''', (id_server, id_member))
+        wishlist = c.fetchall()
+        c.close()
+
+        wishlist = [id_idol[0] for id_idol in wishlist]
+
+        return wishlist
