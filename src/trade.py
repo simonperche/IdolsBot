@@ -11,22 +11,46 @@ class Trade(commands.Cog):
         self.bot = bot
 
     #### Commands ####
-    @commands.command(description='Trade one idol for another.\n  *trade @someone idolname [group]')
-    async def trade(self, ctx, name, group=None):
-        if not ctx.message.mentions:
-            await ctx.send('Please specify another user.')
+    @commands.command(description='Trade one idol for another.')
+    async def trade(self, ctx, user, name, group=None):
+        if not await self.can_give(ctx, user, name, group):
             return
 
         user = ctx.message.mentions[0]
 
-    @commands.command(description='Give one idol to someone.\n  *give @someone idolname [group]')
+    @commands.command(description='Give one idol to someone.')
     async def give(self, ctx, user, name, group=None):
+        id_idol = await self.can_give(ctx, user, name, group)
+        if not id_idol:
+            return
+
+        user = ctx.message.mentions[0]
+
+        def check(message):
+            return message.author == user and (message.content.lower() == 'yes' or message.content.lower() == 'y' or
+                                               message.content.lower() == 'no' or message.content.lower() == 'n')
+
+        await ctx.send(f'{user.mention}, {ctx.author.mention} wants to give you **{name}**.\n'
+                       f'Type \'y|yes\' or \'n|no\'.')
+        try:
+            msg = await self.bot.wait_for('message', timeout=30, check=check)
+        except asyncio.TimeoutError:
+            await ctx.message.add_reaction(u"\u274C")
+            await ctx.send('Too late... Give is cancelled.')
+        else:
+            if msg.content.lower() == 'y' or msg.content.lower() == 'yes':
+                DatabaseDeck.get().give_to(ctx.guild.id, id_idol, ctx.author.id, user.id)
+                await msg.add_reaction(u"\u2705")
+            else:
+                await ctx.send('Give is cancelled.')
+
+    @staticmethod
+    async def can_give(ctx, user, name, group=None):
+        """Return idol id if the user can give, None otherwise."""
         if not ctx.message.mentions:
             await ctx.message.add_reaction(u"\u274C")
-            await ctx.send('Please specify another user.')
-            return
-
-        user = ctx.message.mentions[0]
+            await ctx.send('Please specify a user.')
+            return None
 
         ## Find idol id
         name = name.strip()
@@ -49,28 +73,13 @@ class Trade(commands.Cog):
                 msg += f' in the group *{group}*'
             msg += ' and I couldn\'t find anything.\nPlease check the command.'
             await ctx.send(msg)
-            return
+            return None
 
         ## Check if idol belongs to author
         owner = DatabaseDeck.get().idol_belongs_to(ctx.guild.id, id_idol)
         if not owner or owner != ctx.author.id:
             await ctx.message.add_reaction(u"\u274C")
             await ctx.send(f'You don\'t own **{name}**{" from *" + group + "* " if group else ""}...')
-            return
+            return None
 
-        def check(message):
-            return message.author == user and (message.content.lower() == 'yes' or message.content.lower() == 'y' or
-                                               message.content.lower() == 'no' or message.content.lower() == 'n')
-
-        await ctx.send(f'{user.mention}, type \'y|yes\' or \'n|no\'.')
-        try:
-            msg = await self.bot.wait_for('message', timeout=30, check=check)
-        except asyncio.TimeoutError:
-            await ctx.message.add_reaction(u"\u274C")
-            await ctx.send('Too late... Give is cancelled.')
-        else:
-            if msg.content.lower() == 'y' or msg.content.lower() == 'yes':
-                DatabaseDeck.get().give_to(ctx.guild.id, id_idol, ctx.author.id, user.id)
-                await msg.add_reaction(u"\u2705")
-            else:
-                await ctx.send('Give is cancelled.')
+        return id_idol
