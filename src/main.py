@@ -8,6 +8,7 @@ from admin import Admin
 from profile import Profile
 from information import Information
 from wishlist import Wishlist
+from trade import Trade
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -18,6 +19,7 @@ bot.add_cog(Admin(bot))
 bot.add_cog(Profile(bot))
 bot.add_cog(Information(bot))
 bot.add_cog(Wishlist(bot))
+bot.add_cog(Trade(bot))
 
 #### Bot commands ####
 
