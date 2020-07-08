@@ -23,7 +23,7 @@ class Roll(commands.Cog):
             return
 
         id_idol = DatabaseIdol.get().get_random_idol_id()
-        idol = DatabaseIdol.get().get_idol_information(id_idol)
+        idol = DatabaseIdol.get().get_idol_information(id_idol, ctx.guild.id)
         if not idol:
             ctx.send("An error occurred. If this message is exceptional, "
                      "please try again. Otherwise, contact the administrator.")

@@ -22,7 +22,7 @@ class Profile(commands.Cog):
         # TODO: handle long messages (>2000 letters) with pages
         description = ''
         for id_idol in ids_deck:
-            idol = DatabaseIdol.get().get_idol_information(id_idol)
+            idol = DatabaseIdol.get().get_idol_information(id_idol, ctx.guild.id)
             description += f'**{idol["name"]}** *{idol["group"]}*\n'
 
         embed = discord.Embed(title=user.name if user.nick is None else user.nick, description=description)
