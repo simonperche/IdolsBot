@@ -393,3 +393,14 @@ class DatabaseDeck:
         members = [id_member[0] for id_member in members]
 
         return members
+
+    def give_to(self, id_server, id_idol, id_giver, id_receiver):
+        """Give an idol to another player."""
+        c = self.db.cursor()
+        c.execute('''UPDATE Deck
+                     SET id_member = ?
+                     WHERE id_server = ? AND
+                           id_idol = ? AND
+                           id_member = ?''', (id_receiver, id_server, id_idol, id_giver))
+        self.db.commit()
+        c.close()
