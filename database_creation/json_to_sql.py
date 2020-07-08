@@ -80,7 +80,7 @@ def populate_database(db, json_filename):
     c = db.cursor()
 
     for id_json in data:
-        c.execute(''' INSERT OR IGNORE INTO Idol(name, url) VALUES (?, ?) ''', (data[id_json]['name'], data[id_json]['url'],))
+        c.execute(''' INSERT OR IGNORE INTO Idol(id, name, url) VALUES (?, ?, ?) ''', (id_json, data[id_json]['name'], data[id_json]['url'],))
 
         c.execute(''' SELECT id FROM Idol WHERE url = ? ''', (data[id_json]['url'],))
         id_idol = c.fetchone()
