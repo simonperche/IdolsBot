@@ -102,7 +102,15 @@ class Wishlist(commands.Cog):
 
         for id_idol in ids:
             idol = DatabaseIdol.get().get_idol_information(id_idol)
-            description += f'**{idol["name"]}** *{idol["group"]}*\n'
+            id_owner = DatabaseDeck.get().idol_belongs_to(ctx.guild.id, id_idol)
+            emoji = ''
+
+            if id_owner:
+                if id_owner == ctx.author.id:
+                    emoji = u"\u2705"
+                else:
+                    emoji = u"\u274C"
+            description += f'**{idol["name"]}** *{idol["group"]}* {emoji}\n'
 
         await ctx.send(embed=discord.Embed(title=f'Wish list of {username} ({nb_wish}/{max_wish})',
                                            description=description))
