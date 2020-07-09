@@ -91,7 +91,7 @@ class DatabaseIdol:
         # second [0] for the column in result (here only 1 -> Idol.id)
         return random_idol[0][0]
 
-    def get_idol_information(self, id_idol, id_server):
+    def get_idol_information(self, id_idol, current_image):
         """Return idol information with dict {name, group, image} format."""
         c = self.db.cursor()
         c.execute('''SELECT I.id, I.name, G.name, Image.url
@@ -102,7 +102,6 @@ class DatabaseIdol:
                      WHERE I.id = ?''', (id_idol,))
         idol = c.fetchall()
         c.close()
-        current_image = DatabaseDeck.get().get_idol_current_image(id_server, id_idol)
 
         return {'id': idol[current_image][0], 'name': idol[current_image][1], 'group': idol[current_image][2], 'image': idol[current_image][3]}
 

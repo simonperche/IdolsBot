@@ -54,7 +54,8 @@ class Information(commands.Cog):
             await ctx.send(msg)
             return
 
-        idol = DatabaseIdol.get().get_idol_information(id_idol, ctx.guild.id)
+        current_image = DatabaseDeck.get().get_idol_current_image(ctx.guild.id, id_idol)
+        idol = DatabaseIdol.get().get_idol_information(id_idol, current_image)
 
         embed = discord.Embed(title=idol['name'], description=idol['group'], colour=secrets.randbelow(0xffffff))
 
@@ -110,7 +111,8 @@ class Information(commands.Cog):
                 # Refresh embed message with the new picture if changed
                 if old_image != current_image:
                     # Redo the query because image link changed
-                    idol = DatabaseIdol.get().get_idol_information(id_idol, ctx.guild.id)
+                    image_number = DatabaseDeck.get().get_idol_current_image(ctx.guild.id, id_idol)
+                    idol = DatabaseIdol.get().get_idol_information(id_idol, image_number)
                     embed.set_image(url=idol['image'])
                     text = f'{current_image} \\ {total_images} \n'
                     if id_owner and owner:
@@ -127,7 +129,8 @@ class Information(commands.Cog):
 
         description = '' if ids else 'No idols found'
         for id_idol in ids:
-            idol = DatabaseIdol.get().get_idol_information(id_idol, ctx.guild.id)
+            image_number = DatabaseDeck.get().get_idol_current_image(ctx.guild.id, id_idol)
+            idol = DatabaseIdol.get().get_idol_information(id_idol, image_number)
             description += f'**{idol["name"]}** *{idol["group"]}*\n'
 
         embed = discord.Embed(title=f'{name} idols', description=description)
