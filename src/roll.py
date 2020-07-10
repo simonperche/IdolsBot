@@ -112,7 +112,7 @@ def min_until_next_claim(id_server, id_user):
     if last_claim:
         claim_interval = DatabaseDeck.get().get_server_configuration(id_server)['claim_interval']
         date_last_claim = datetime.strptime(last_claim, '%Y-%m-%d %H:%M:%S')
-        minute_since_last_claim = divmod((datetime.now() - date_last_claim).seconds, 60)[0]
+        minute_since_last_claim = int(divmod((datetime.now() - date_last_claim).total_seconds(), 60)[0])
 
         if minute_since_last_claim < claim_interval:
             time_until_claim = claim_interval - minute_since_last_claim
