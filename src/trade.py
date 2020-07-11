@@ -1,4 +1,6 @@
 import asyncio
+import string
+import random
 
 from discord.ext import commands
 
@@ -98,6 +100,67 @@ class Trade(commands.Cog):
                 await msg.add_reaction(u"\u2705")
             else:
                 await ctx.send('Give is cancelled.')
+
+    @commands.command(description='Remove an idol from your deck (can\'t be undone!).')
+    async def discard(self, ctx, name, group=None):
+        id_idol = await self.can_give(ctx, ctx.author, name, group)
+        if not id_idol:
+            return
+
+        def check(message):
+            return message.author == ctx.author \
+                   and message.channel == ctx.message.channel \
+                   and (message.content.lower() == 'yes' or message.content.lower() == 'y' or
+                        message.content.lower() == 'no' or message.content.lower() == 'n')
+
+        await ctx.send(f'{ctx.author.mention}, are you sure you want to discard **{name}**? (y|yes or n|no)\n')
+        try:
+            msg = await self.bot.wait_for('message', timeout=30, check=check)
+        except asyncio.TimeoutError:
+            await ctx.message.add_reaction(u"\u274C")
+            await ctx.send('Discard is cancelled.')
+        else:
+            if msg.content.lower() == 'y' or msg.content.lower() == 'yes':
+                DatabaseDeck.get().give_to(ctx.guild.id, id_idol, ctx.author.id, None)
+                await ctx.message.add_reaction(u"\u2705")
+                await msg.add_reaction(u"\u2705")
+            else:
+                await ctx.send('Discard is cancelled.')
+
+    @commands.command(description='Remove all idols from your deck (can\'t be undone!).')
+    async def discard_all(self, ctx):
+        letters = string.ascii_letters
+        random_string = 'cancel'
+
+        while random_string == 'cancel':
+            random_string = ''.join(random.choice(letters) for i in range(5))
+
+        def check(message):
+            return message.author == ctx.author \
+                   and message.channel == ctx.message.channel \
+                   and (message.content == random_string or message.content.lower() == 'cancel')
+
+        await ctx.send(f'{ctx.author.mention}, are you sure you want to discard **all your deck**?\n'
+                       f'This cannot be undone! Please type *{random_string}* (with case) to confirm '
+                       f'or *cancel* to cancel.')
+        try:
+            msg = await self.bot.wait_for('message', timeout=30, check=check)
+        except asyncio.TimeoutError:
+            await ctx.message.add_reaction(u"\u274C")
+            await ctx.send('Discard is cancelled.')
+        else:
+            if msg.content.lower() == 'cancel':
+                await ctx.message.add_reaction(u"\u274C")
+                await ctx.send('Discard is cancelled.')
+                return
+
+            ids_deck = DatabaseDeck.get().get_user_deck(ctx.guild.id, ctx.author.id)
+
+            for id_idol in ids_deck:
+                DatabaseDeck.get().give_to(ctx.guild.id, id_idol, ctx.author.id, None)
+
+            await ctx.message.add_reaction(u"\u2705")
+            await msg.add_reaction(u"\u2705")
 
     @staticmethod
     async def can_give(ctx, author, name, group=None):
