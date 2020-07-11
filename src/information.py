@@ -9,12 +9,6 @@ from database import DatabaseIdol, DatabaseDeck
 
 class Information(commands.Cog):
 
-    def parse_int(self, content):
-        try:
-            return int(content)
-        except ValueError:
-            return 0
-
     def __init__(self, bot):
         """Initial the cog with the bot."""
         self.bot = bot
@@ -63,7 +57,7 @@ class Information(commands.Cog):
 
         # Counter variables
         total_images = DatabaseIdol.get().get_idol_images_count(id_idol)
-        current_image = self.parse_int(DatabaseDeck().get().get_idol_current_image(ctx.guild.id, id_idol)) + 1
+        current_image = parse_int(DatabaseDeck().get().get_idol_current_image(ctx.guild.id, id_idol)) + 1
 
         # Footer have always the picture counter, and eventually the owner info
         text = f'{current_image} \\ {total_images} \n'
@@ -105,7 +99,7 @@ class Information(commands.Cog):
                 if reaction.emoji == right_emoji:
                     DatabaseDeck.get().increment_idol_current_image(ctx.guild.id, id_idol)
 
-                current_image = self.parse_int(DatabaseDeck().get().get_idol_current_image(ctx.guild.id, id_idol)) + 1
+                current_image = parse_int(DatabaseDeck().get().get_idol_current_image(ctx.guild.id, id_idol)) + 1
                 await msg.remove_reaction(reaction.emoji, user)
 
                 # Refresh embed message with the new picture if changed
@@ -148,3 +142,10 @@ class Information(commands.Cog):
                               description='\n'.join([f'**{member}**' for member in group['members']]))
 
         await ctx.send(embed=embed)
+
+
+def parse_int(content):
+    try:
+        return int(content)
+    except ValueError:
+        return 0

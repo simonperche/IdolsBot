@@ -1,6 +1,6 @@
 import asyncio
 import string
-import random
+import secrets
 
 from discord.ext import commands
 
@@ -133,7 +133,7 @@ class Trade(commands.Cog):
         random_string = 'cancel'
 
         while random_string == 'cancel':
-            random_string = ''.join(random.choice(letters) for i in range(5))
+            random_string = ''.join(secrets.choice(letters) for i in range(5))
 
         def check(message):
             return message.author == ctx.author \

@@ -39,10 +39,10 @@ class Profile(commands.Cog):
 
         msg = f'{username}, you '
         if next_claim == 0:
-            msg += f'can claim right now!'
+            msg += 'can claim right now!'
         else:
             time = divmod(next_claim, 60)
-            msg += f'can\'t claim for another **' + \
+            msg += 'can\'t claim for another **' + \
                    (str(time[0]) + 'h ' if time[0] != 0 else '') + f'{str(time[1])} min**.'
 
         user_nb_rolls = DatabaseDeck.get().get_nb_rolls(ctx.guild.id, ctx.author.id)

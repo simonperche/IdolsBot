@@ -434,7 +434,6 @@ class DatabaseDeck:
 
     def decrement_idol_current_image(self, id_server, id_idol):
         """Try to decrement the current image number."""
-
         self.create_active_image_if_not_exist(id_server, id_idol)
         current_image = self.get_idol_current_image(id_server, id_idol)
         if current_image > 0:
