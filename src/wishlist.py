@@ -101,7 +101,8 @@ class Wishlist(commands.Cog):
         max_wish = DatabaseDeck.get().get_max_wish(ctx.guild.id, ctx.author.id)
 
         for id_idol in ids:
-            idol = DatabaseIdol.get().get_idol_information(id_idol)
+            current_image = DatabaseDeck.get().get_idol_current_image(ctx.guild.id, id_idol)
+            idol = DatabaseIdol.get().get_idol_information(id_idol, current_image)
             id_owner = DatabaseDeck.get().idol_belongs_to(ctx.guild.id, id_idol)
             emoji = ''
 

@@ -37,6 +37,15 @@ class DatabaseIdol:
 
         return ids
 
+    def get_idol_images_count(self, id_idol):
+        """Get images count of an idol"""
+        c = self.db.cursor()
+        c.execute(''' SELECT COUNT(url) FROM Image 
+                    WHERE id_idol = ?''', (id_idol,))
+        images_count = c.fetchone()[0]
+        c.close()
+        return images_count
+
     def get_idol_group_id(self, name, group):
         """Return the idol with name and group or None otherwise."""
         c = self.db.cursor()
@@ -82,7 +91,7 @@ class DatabaseIdol:
         # second [0] for the column in result (here only 1 -> Idol.id)
         return random_idol[0][0]
 
-    def get_idol_information(self, id_idol):
+    def get_idol_information(self, id_idol, current_image):
         """Return idol information with dict {name, group, image} format."""
         c = self.db.cursor()
         c.execute('''SELECT I.id, I.name, G.name, Image.url
@@ -91,10 +100,10 @@ class DatabaseIdol:
                      JOIN Groups AS G ON IG.id_groups = G.id
                      JOIN Image ON Image.id_idol = I.id
                      WHERE I.id = ?''', (id_idol,))
-        idol = c.fetchone()
+        idol = c.fetchall()
         c.close()
 
-        return {'id': idol[0], 'name': idol[1], 'group': idol[2], 'image': idol[3]}
+        return {'id': idol[current_image][0], 'name': idol[current_image][1], 'group': idol[current_image][2], 'image': idol[current_image][3]}
 
 
 class DatabaseDeck:
@@ -112,6 +121,7 @@ class DatabaseDeck:
             DatabaseDeck.__instance = self
             self.db = sqlite3.connect('./database_deck.db')
             self.create_if_not_exist()
+            self.add_current_image_column_if_not_exist()
 
     def create_if_not_exist(self):
         c = self.db.cursor()
@@ -137,8 +147,10 @@ class DatabaseDeck:
         self.create_server_if_not_exist(id_server)
         self.create_member_if_not_exist(id_member)
         c = self.db.cursor()
-        c.execute('''INSERT INTO Deck(id_server, id_idol, id_member)
-                     VALUES(?, ?, ?)''', (id_server, id_idol, id_member))
+        c.execute('''UPDATE Deck SET id_member = ? WHERE id_server = ? AND id_idol = ? ''',
+                  (id_member, id_server, id_idol))
+        # c.execute('''INSERT INTO Deck(id_server, id_idol, id_member)
+        #             VALUES(?, ?, ?)''', (id_server, id_idol, id_member))
         self.db.commit()
         c.close()
 
@@ -189,12 +201,34 @@ class DatabaseDeck:
         self.db.commit()
         c.close()
 
+    def create_active_image_if_not_exist(self, id_server, id_idol):
+        c = self.db.cursor()
+        c.execute('''INSERT OR IGNORE INTO Deck(id_server, id_idol, current_image) 
+                                    VALUES (?, ?, ?)''', (id_server, id_idol, 0))
+        self.db.commit()
+        c.close()
+
     def create_member_information_if_not_exist(self, id_server, id_member):
         c = self.db.cursor()
         c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member)
                                      VALUES (?, ?)''', (id_server, id_member))
         self.db.commit()
         c.close()
+
+    def add_current_image_column_if_not_exist(self):
+        c = self.db.cursor()
+
+        # Query to check if the current_image column exists
+        c.execute('''SELECT COUNT(*) AS CNTREC FROM pragma_table_info('DECK') WHERE name='CURRENT_IMAGE' ''')
+
+        if c.fetchone()[0] != 1:
+            with open('create_database_images_column.sql', 'r') as f:
+                print("Adding image column in the database...")
+                query = f.read()
+                c = self.db.cursor()
+                c.executescript(query)
+                self.db.commit()
+                c.close()
 
     def set_claiming_interval(self, id_server, interval):
         self.create_server_if_not_exist(id_server)
@@ -404,3 +438,47 @@ class DatabaseDeck:
                            id_member = ?''', (id_receiver, id_server, id_idol, id_giver))
         self.db.commit()
         c.close()
+
+    def update_idol_current_image(self, id_server, id_idol, current_image):
+        c = self.db.cursor()
+        c.execute('''UPDATE Deck
+                             SET current_image = ?
+                             WHERE id_server = ? AND id_idol = ?''', (current_image, id_server, id_idol))
+        self.db.commit()
+        c.close()
+
+    def decrement_idol_current_image(self, id_server, id_idol):
+        """Try to decrement the current image number"""
+
+        self.create_active_image_if_not_exist(id_server, id_idol)
+        current_image = self.get_idol_current_image(id_server, id_idol)
+        if current_image > 0:
+            current_image = current_image - 1
+
+        self.update_idol_current_image(id_server, id_idol, current_image)
+        return current_image
+
+    def increment_idol_current_image(self, id_server, id_idol):
+        """Try to increment the current image number"""
+        self.create_active_image_if_not_exist(id_server, id_idol)
+        current_image = self.get_idol_current_image(id_server, id_idol)
+        image_count = DatabaseIdol.get().get_idol_images_count(id_idol)
+
+        if current_image < (image_count-1):
+            current_image = current_image + 1
+
+        self.update_idol_current_image(id_server, id_idol, current_image)
+
+        return current_image
+
+    def get_idol_current_image(self, id_server, id_idol):
+        """Get the current image associated to the idol"""
+        self.create_active_image_if_not_exist(id_server, id_idol)
+        c = self.db.cursor()
+        c.execute('''SELECT current_image
+                     FROM Deck
+                     WHERE id_server = ? AND id_idol = ?''', (id_server, id_idol))
+        current_image = c.fetchone()
+        c.close()
+
+        return current_image[0]
