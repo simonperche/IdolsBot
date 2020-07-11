@@ -38,9 +38,9 @@ class DatabaseIdol:
         return ids
 
     def get_idol_images_count(self, id_idol):
-        """Get images count of an idol"""
+        """Get images count of an idol."""
         c = self.db.cursor()
-        c.execute(''' SELECT COUNT(url) FROM Image 
+        c.execute('''SELECT COUNT(url) FROM Image
                     WHERE id_idol = ?''', (id_idol,))
         images_count = c.fetchone()[0]
         c.close()
@@ -103,7 +103,8 @@ class DatabaseIdol:
         idol = c.fetchall()
         c.close()
 
-        return {'id': idol[current_image][0], 'name': idol[current_image][1], 'group': idol[current_image][2], 'image': idol[current_image][3]}
+        return {'id': idol[current_image][0], 'name': idol[current_image][1],
+                'group': idol[current_image][2], 'image': idol[current_image][3]}
 
 
 class DatabaseDeck:
@@ -121,7 +122,6 @@ class DatabaseDeck:
             DatabaseDeck.__instance = self
             self.db = sqlite3.connect('./database_deck.db')
             self.create_if_not_exist()
-            self.add_current_image_column_if_not_exist()
 
     def create_if_not_exist(self):
         c = self.db.cursor()
@@ -203,32 +203,17 @@ class DatabaseDeck:
 
     def create_active_image_if_not_exist(self, id_server, id_idol):
         c = self.db.cursor()
-        c.execute('''INSERT OR IGNORE INTO Deck(id_server, id_idol, current_image) 
-                                    VALUES (?, ?, ?)''', (id_server, id_idol, 0))
+        c.execute('''INSERT OR IGNORE INTO Deck(id_server, id_idol, current_image)
+                     VALUES (?, ?, ?)''', (id_server, id_idol, 0))
         self.db.commit()
         c.close()
 
     def create_member_information_if_not_exist(self, id_server, id_member):
         c = self.db.cursor()
         c.execute('''INSERT OR IGNORE INTO MemberInformation(id_server, id_member)
-                                     VALUES (?, ?)''', (id_server, id_member))
+                     VALUES (?, ?)''', (id_server, id_member))
         self.db.commit()
         c.close()
-
-    def add_current_image_column_if_not_exist(self):
-        c = self.db.cursor()
-
-        # Query to check if the current_image column exists
-        c.execute('''SELECT COUNT(*) AS CNTREC FROM pragma_table_info('DECK') WHERE name='CURRENT_IMAGE' ''')
-
-        if c.fetchone()[0] != 1:
-            with open('create_database_images_column.sql', 'r') as f:
-                print("Adding image column in the database...")
-                query = f.read()
-                c = self.db.cursor()
-                c.executescript(query)
-                self.db.commit()
-                c.close()
 
     def set_claiming_interval(self, id_server, interval):
         self.create_server_if_not_exist(id_server)
@@ -442,13 +427,13 @@ class DatabaseDeck:
     def update_idol_current_image(self, id_server, id_idol, current_image):
         c = self.db.cursor()
         c.execute('''UPDATE Deck
-                             SET current_image = ?
-                             WHERE id_server = ? AND id_idol = ?''', (current_image, id_server, id_idol))
+                     SET current_image = ?
+                     WHERE id_server = ? AND id_idol = ?''', (current_image, id_server, id_idol))
         self.db.commit()
         c.close()
 
     def decrement_idol_current_image(self, id_server, id_idol):
-        """Try to decrement the current image number"""
+        """Try to decrement the current image number."""
 
         self.create_active_image_if_not_exist(id_server, id_idol)
         current_image = self.get_idol_current_image(id_server, id_idol)
@@ -459,7 +444,7 @@ class DatabaseDeck:
         return current_image
 
     def increment_idol_current_image(self, id_server, id_idol):
-        """Try to increment the current image number"""
+        """Try to increment the current image number."""
         self.create_active_image_if_not_exist(id_server, id_idol)
         current_image = self.get_idol_current_image(id_server, id_idol)
         image_count = DatabaseIdol.get().get_idol_images_count(id_idol)
@@ -472,7 +457,7 @@ class DatabaseDeck:
         return current_image
 
     def get_idol_current_image(self, id_server, id_idol):
-        """Get the current image associated to the idol"""
+        """Get the current image associated to the idol."""
         self.create_active_image_if_not_exist(id_server, id_idol)
         c = self.db.cursor()
         c.execute('''SELECT current_image
