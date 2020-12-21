@@ -19,17 +19,24 @@ class Profile(commands.Cog):
 
         ids_deck = DatabaseDeck.get().get_user_deck(ctx.guild.id, user.id)
 
+        async def send_embed(desc):
+            embed = discord.Embed(title=user.name if user.nick is None else user.nick, description=desc)
+            embed.set_thumbnail(url=user.avatar_url)
+            await ctx.send(embed=embed)
+
         # TODO: handle long messages (>2000 letters) with pages
         description = ''
         for id_idol in ids_deck:
             current_image = DatabaseDeck.get().get_idol_current_image(ctx.guild.id, id_idol)
             idol = DatabaseIdol.get().get_idol_information(id_idol, current_image)
-            description += f'**{idol["name"]}** *{idol["group"]}*\n'
+            idols_text = f'**{idol["name"]}** *{idol["group"]}*\n'
+            if len(idols_text) + len(description) > 2000:
+                await send_embed(description)
+                description = idols_text
+            else:
+                description += idols_text
 
-        embed = discord.Embed(title=user.name if user.nick is None else user.nick, description=description)
-        embed.set_thumbnail(url=user.avatar_url)
-
-        await ctx.send(embed=embed)
+        await send_embed(description)
 
     @commands.command(aliases=['tu'], description='Show time before next rolls and claim reset.')
     async def time(self, ctx):
