@@ -50,6 +50,27 @@ class Admin(commands.Cog):
         DatabaseDeck.get().set_time_to_claim(ctx.guild.id, time_to_claim)
         await ctx.message.add_reaction(u"\u2705")
 
+    @commands.command(description='Set number of wishes allowed to a user. '
+                                  'Please use discord mention to indicate the user.')
+    @has_permissions(administrator=True)
+    async def set_max_wish(self, ctx, max_wish):
+        if not ctx.message.mentions:
+            await ctx.send('Please mention a user.')
+            await ctx.message.add_reaction(u"\u274C")
+            return
+
+        user = ctx.message.mentions[0]
+
+        try:
+            max_wish = int(max_wish)
+        except ValueError:
+            await ctx.send('Please enter a number.')
+            await ctx.message.add_reaction(u"\u274C")
+            return
+
+        DatabaseDeck.get().set_max_wish(ctx.guild.id, user.id, max_wish)
+        await ctx.message.add_reaction(u"\u2705")
+
     @commands.command(aliases=['show_config'], description='Show the current configuration of the bot for this server.')
     @has_permissions(administrator=True)
     async def show_configuration(self, ctx):

@@ -1,5 +1,6 @@
 import os
 
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -10,9 +11,12 @@ from information import Information
 from wishlist import Wishlist
 from trade import Trade
 
+intents = discord.Intents.default()
+intents.members = True
+
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
-bot = commands.Bot(command_prefix='*')
+bot = commands.Bot(command_prefix='*', intents=intents)
 
 bot.add_cog(Roll(bot))
 bot.add_cog(Admin(bot))

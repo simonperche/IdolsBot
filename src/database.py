@@ -242,6 +242,15 @@ class DatabaseDeck:
         self.db.commit()
         c.close()
 
+    def set_max_wish(self, id_server, id_member, max_wish):
+        c = self.db.cursor()
+        self.create_member_information_if_not_exist(id_server, id_member)
+        c.execute('''UPDATE MemberInformation
+                     SET max_wish = ?
+                     WHERE id_server = ? AND id_member = ?''', (max_wish, id_server, id_member))
+        self.db.commit()
+        c.close()
+
     def get_user_deck(self, id_server, id_member):
         """Return a list of idol ids."""
         c = self.db.cursor()
