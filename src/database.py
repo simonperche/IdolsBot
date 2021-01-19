@@ -59,6 +59,19 @@ class DatabaseIdol:
 
         return id_idol[0] if id_idol else None
 
+    def get_all_groups(self):
+        """Return all groups."""
+        c = self.db.cursor()
+        c.execute('''SELECT G.name
+                     FROM Groups AS G
+                     ORDER BY G.name ASC''')
+        results = c.fetchall()
+        c.close()
+
+        group = [r[0].title() for r in results]
+
+        return group
+
     def get_group_members(self, group_name):
         """Return all group members with dict {name, members=[]}."""
         c = self.db.cursor()

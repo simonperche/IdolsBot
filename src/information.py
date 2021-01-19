@@ -135,11 +135,24 @@ class Information(commands.Cog):
         group = DatabaseIdol.get().get_group_members(group_name)
 
         if not group:
-            ctx.send(f'No *{group_name}* group found.')
+            await ctx.send(f'No *{group_name}* group found.')
             return
 
         embed = discord.Embed(title=f'*{group["name"]}* group',
                               description='\n'.join([f'**{member}**' for member in group['members']]))
+
+        await ctx.send(embed=embed)
+
+    @commands.command(description='Show all groups available')
+    async def list_groups(self, ctx):
+        groups = DatabaseIdol.get().get_all_groups()
+
+        if not groups:
+            await ctx.send(f'No group found. This is probably an error.')
+            return
+
+        embed = discord.Embed(title=f'All groups',
+                              description='\n'.join([f'**{group}**' for group in groups]))
 
         await ctx.send(embed=embed)
 
