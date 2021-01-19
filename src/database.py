@@ -460,6 +460,9 @@ class DatabaseDeck:
         current_image = self.get_idol_current_image(id_server, id_idol)
         if current_image > 0:
             current_image = current_image - 1
+        else:
+            image_count = DatabaseIdol.get().get_idol_images_count(id_idol)
+            current_image = (image_count-1)
 
         self.update_idol_current_image(id_server, id_idol, current_image)
         return current_image
@@ -472,6 +475,8 @@ class DatabaseDeck:
 
         if current_image < (image_count-1):
             current_image = current_image + 1
+        else:
+            current_image = 0
 
         self.update_idol_current_image(id_server, id_idol, current_image)
 
