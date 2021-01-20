@@ -29,7 +29,7 @@ class DatabaseIdol:
 
     def get_idol_ids(self, name):
         c = self.db.cursor()
-        c.execute('''SELECT I.id FROM Idol AS I WHERE I.name = ? COLLATE NOCASE''', (name,))
+        c.execute('''SELECT I.id FROM Idol AS I WHERE I.name LIKE ? COLLATE NOCASE''', (f'%{name}%',))
         results = c.fetchall()
         c.close()
 
@@ -52,8 +52,8 @@ class DatabaseIdol:
         c.execute('''SELECT I.id FROM Idol AS I
                      JOIN IdolGroups AS IG ON IG.id_idol = I.id 
                      JOIN Groups AS G ON IG.id_groups = G.id
-                     WHERE G.name = ? COLLATE NOCASE
-                     AND I.name = ? COLLATE NOCASE''', (group, name))
+                     WHERE G.name LIKE ? COLLATE NOCASE
+                     AND I.name LIKE ? COLLATE NOCASE''', (f'%{group}%', f'%{name}%'))
         id_idol = c.fetchone()
         c.close()
 
@@ -78,8 +78,8 @@ class DatabaseIdol:
         c.execute('''SELECT G.name, I.name FROM Idol AS I
                      JOIN IdolGroups AS IG ON IG.id_idol = I.id 
                      JOIN Groups AS G ON IG.id_groups = G.id
-                     WHERE G.name = ? COLLATE NOCASE
-                     ORDER BY I.name ASC''', (group_name,))
+                     WHERE G.name LIKE ? COLLATE NOCASE
+                     ORDER BY I.name ASC''', (f'%{group_name}%',))
         results = c.fetchall()
         c.close()
 
@@ -116,6 +116,9 @@ class DatabaseIdol:
                      WHERE I.id = ?''', (id_idol,))
         idol = c.fetchall()
         c.close()
+
+        if not idol:
+            return None
 
         return {'id': idol[current_image][0], 'name': idol[current_image][1],
                 'group': idol[current_image][2], 'image': idol[current_image][3]}
