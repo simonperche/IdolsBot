@@ -60,7 +60,7 @@ class Profile(commands.Cog):
 
             while not timeout:
                 try:
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=10, check=check)
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60, check=check)
                 except asyncio.TimeoutError:
                     await msg.clear_reaction(left_emoji)
                     await msg.clear_reaction(right_emoji)

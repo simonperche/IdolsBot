@@ -78,7 +78,8 @@ class DatabaseIdol:
         c.execute('''SELECT G.name, I.name FROM Idol AS I
                      JOIN IdolGroups AS IG ON IG.id_idol = I.id 
                      JOIN Groups AS G ON IG.id_groups = G.id
-                     WHERE G.name = ? COLLATE NOCASE''', (group_name,))
+                     WHERE G.name = ? COLLATE NOCASE
+                     ORDER BY I.name ASC''', (group_name,))
         results = c.fetchall()
         c.close()
 
