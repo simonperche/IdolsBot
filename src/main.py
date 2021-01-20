@@ -10,6 +10,7 @@ from profile import Profile
 from information import Information
 from wishlist import Wishlist
 from trade import Trade
+from images import Images
 
 intents = discord.Intents.default()
 intents.members = True
@@ -24,6 +25,7 @@ bot.add_cog(Profile(bot))
 bot.add_cog(Information(bot))
 bot.add_cog(Wishlist(bot))
 bot.add_cog(Trade(bot))
+bot.add_cog(Images(bot))
 
 #### Bot commands ####
 

@@ -120,6 +120,18 @@ class DatabaseIdol:
         return {'id': idol[current_image][0], 'name': idol[current_image][1],
                 'group': idol[current_image][2], 'image': idol[current_image][3]}
 
+    def add_image(self, id_idol, url):
+        c = self.db.cursor()
+        c.execute(''' INSERT OR IGNORE INTO Image(url, id_idol) VALUES (?, ?) ''', (url, id_idol,))
+        self.db.commit()
+        c.close()
+
+    def remove_image(self, id_idol, url):
+        c = self.db.cursor()
+        c.execute(''' DELETE FROM Image WHERE url = ? AND id_idol = ? ''', (url, id_idol,))
+        self.db.commit()
+        c.close()
+
 
 class DatabaseDeck:
     __instance = None
