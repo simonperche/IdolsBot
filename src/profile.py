@@ -1,4 +1,6 @@
 from datetime import datetime
+import asyncio
+import math
 
 import discord
 from discord.ext import commands
@@ -24,19 +26,60 @@ class Profile(commands.Cog):
             embed.set_thumbnail(url=user.avatar_url)
             await ctx.send(embed=embed)
 
-        # TODO: handle long messages (>2000 letters) with pages
+        idols_text = []
         description = ''
         for id_idol in ids_deck:
             current_image = DatabaseDeck.get().get_idol_current_image(ctx.guild.id, id_idol)
             idol = DatabaseIdol.get().get_idol_information(id_idol, current_image)
-            idols_text = f'**{idol["name"]}** *{idol["group"]}*\n'
-            if len(idols_text) + len(description) > 2000:
-                await send_embed(description)
-                description = idols_text
-            else:
-                description += idols_text
+            idols_text.append(f'**{idol["name"]}** *{idol["group"]}*')
 
-        await send_embed(description)
+        current_page = 1
+        nb_per_page = 20
+        max_page = math.ceil(len(idols_text) / float(nb_per_page))
+
+        embed = discord.Embed(title=user.name if user.nick is None else user.nick,
+                              description='\n'.join([idol for idol in idols_text[(current_page - 1) * nb_per_page:current_page * nb_per_page]]))
+        embed.set_thumbnail(url=user.avatar_url)
+        embed.set_footer(text=f'{current_page} \\ {max_page}')
+        msg = await ctx.send(embed=embed)
+
+        if max_page > 1:
+            # Page handler
+            left_emoji = '\U00002B05'
+            right_emoji = '\U000027A1'
+            await msg.add_reaction(left_emoji)
+            await msg.add_reaction(right_emoji)
+
+            def check(reaction, user):
+                return user != self.bot.user and (str(reaction.emoji) == left_emoji or str(reaction.emoji) == right_emoji) \
+                       and reaction.message.id == msg.id
+
+            timeout = False
+
+            while not timeout:
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=10, check=check)
+                except asyncio.TimeoutError:
+                    await msg.clear_reaction(left_emoji)
+                    await msg.clear_reaction(right_emoji)
+                    timeout = True
+                else:
+                    old_page = current_page
+                    if reaction.emoji == left_emoji:
+                        current_page = current_page - 1 if current_page > 1 else max_page
+
+                    if reaction.emoji == right_emoji:
+                        current_page = current_page + 1 if current_page < max_page else 1
+
+                    await msg.remove_reaction(reaction.emoji, user)
+
+                    # Refresh embed message with the new text
+                    if old_page != current_page:
+                        embed = discord.Embed(title=user.name if user.nick is None else user.nick,
+                                              description='\n'.join([idol for idol in idols_text[(current_page - 1) * nb_per_page:current_page * nb_per_page]]))
+                        embed.set_thumbnail(url=user.avatar_url)
+                        embed.set_footer(text=f'{current_page} \\ {max_page}')
+                        await msg.edit(embed=embed)
 
     @commands.command(aliases=['tu'], description='Show time before next rolls and claim reset.')
     async def time(self, ctx):

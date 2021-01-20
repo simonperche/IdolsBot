@@ -162,41 +162,42 @@ class Information(commands.Cog):
 
         msg = await ctx.send(embed=embed)
 
-        # Page handler
-        left_emoji = '\U00002B05'
-        right_emoji = '\U000027A1'
-        await msg.add_reaction(left_emoji)
-        await msg.add_reaction(right_emoji)
+        if max_page > 1:
+            # Page handler
+            left_emoji = '\U00002B05'
+            right_emoji = '\U000027A1'
+            await msg.add_reaction(left_emoji)
+            await msg.add_reaction(right_emoji)
 
-        def check(reaction, user):
-            return user != self.bot.user and (str(reaction.emoji) == left_emoji or str(reaction.emoji) == right_emoji) \
-                   and reaction.message.id == msg.id
+            def check(reaction, user):
+                return user != self.bot.user and (str(reaction.emoji) == left_emoji or str(reaction.emoji) == right_emoji) \
+                       and reaction.message.id == msg.id
 
-        timeout = False
+            timeout = False
 
-        while not timeout:
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=10, check=check)
-            except asyncio.TimeoutError:
-                await msg.clear_reaction(left_emoji)
-                await msg.clear_reaction(right_emoji)
-                timeout = True
-            else:
-                old_page = current_page
-                if reaction.emoji == left_emoji:
-                    current_page = current_page - 1 if current_page > 1 else max_page
+            while not timeout:
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=10, check=check)
+                except asyncio.TimeoutError:
+                    await msg.clear_reaction(left_emoji)
+                    await msg.clear_reaction(right_emoji)
+                    timeout = True
+                else:
+                    old_page = current_page
+                    if reaction.emoji == left_emoji:
+                        current_page = current_page - 1 if current_page > 1 else max_page
 
-                if reaction.emoji == right_emoji:
-                    current_page = current_page + 1 if current_page < max_page else 1
+                    if reaction.emoji == right_emoji:
+                        current_page = current_page + 1 if current_page < max_page else 1
 
-                await msg.remove_reaction(reaction.emoji, user)
+                    await msg.remove_reaction(reaction.emoji, user)
 
-                # Refresh embed message with the new text
-                if old_page != current_page:
-                    embed = discord.Embed(title=f'All groups',
-                                          description='\n'.join([f'**{group}**' for group in groups[(current_page-1) * nb_per_page:current_page * nb_per_page]]))
-                    embed.set_footer(text=f'{current_page} \\ {max_page}')
-                    await msg.edit(embed=embed)
+                    # Refresh embed message with the new text
+                    if old_page != current_page:
+                        embed = discord.Embed(title=f'All groups',
+                                              description='\n'.join([f'**{group}**' for group in groups[(current_page-1) * nb_per_page:current_page * nb_per_page]]))
+                        embed.set_footer(text=f'{current_page} \\ {max_page}')
+                        await msg.edit(embed=embed)
 
 
 def parse_int(content):
