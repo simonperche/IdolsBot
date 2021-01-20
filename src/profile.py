@@ -33,6 +33,8 @@ class Profile(commands.Cog):
             idol = DatabaseIdol.get().get_idol_information(id_idol, current_image)
             idols_text.append(f'**{idol["name"]}** *{idol["group"]}*')
 
+        idols_text.sort()
+
         current_page = 1
         nb_per_page = 20
         max_page = math.ceil(len(idols_text) / float(nb_per_page))
