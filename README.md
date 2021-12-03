@@ -1,3 +1,4 @@
+# **Updated version exists [here](https://github.com/SimonPerche/PersonalitiesWars)**.
 # IdolsBot
 
 A [Mudae](https://top.gg/bot/432610292342587392) like bot only for KPop idols.
